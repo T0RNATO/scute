@@ -1,0 +1,1 @@
+give @s stone{CustomModelData: 3, Enchantments: [{id: , lvl: 1}], myCustomTag: 3b} 5setblock 69 33 -100 stone
