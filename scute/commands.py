@@ -9,7 +9,7 @@ def command(func):
     def wrapper(*args, **kwargs):
         result = func(*args, **kwargs)
         if isinstance(result, str):
-            command_stack.append(result)
+            command_stack.append(result + "\n")
         elif isinstance(result, execute):
             command_stack[-1] = result.com
         return result
