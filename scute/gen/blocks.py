@@ -1,5 +1,5 @@
 class Block:
-    def __init__(self, name : str, nbt: dict = None):
+    def __init__(self, name: str, nbt: dict = None):
         self.id = name
         self.nbt = nbt
 

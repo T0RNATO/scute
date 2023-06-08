@@ -2,13 +2,9 @@ from scute.commands import command_stack
 from os.path import join
 import os, json, shutil
 
+
 class pack:
-    meta = {
-        "pack": {
-            "pack_format": 1,
-            "description": "My first pack"
-        }
-    }
+    meta = {"pack": {"pack_format": 1, "description": "My first pack"}}
     name = ""
     path = ""
 
@@ -41,11 +37,11 @@ class pack:
         pack.name = name
 
     @staticmethod
-    def setDescription(desc:str):
+    def setDescription(desc: str):
         pack.meta["pack"]["description"] = desc
 
     @staticmethod
-    def setVersion(version:str|int):
+    def setVersion(version: str | int):
         """
         :param version: Can be a major release like "1.19.4" (goes back to 1.16) or a pack_format number like 11
         """
@@ -55,11 +51,12 @@ class pack:
             pack.meta["pack"]["pack_format"] = version
 
     @staticmethod
-    def setBuildPath(path:str):
+    def setBuildPath(path: str):
         """
         Sets the folder which your datapack will be built into - for example, "%appdata%/.minecraft/saves/world/datapacks. Should be a full path."
         """
         pack.path = path
+
 
 versions = {
     "1.16": 5,
@@ -77,5 +74,5 @@ versions = {
     "1.19.1": 10,
     "1.19.2": 10,
     "1.19.3": 10,
-    "1.19.4": 12
+    "1.19.4": 12,
 }

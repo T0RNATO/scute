@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Relation(Enum):
     attacker = "attacker"
     controller = "controller"

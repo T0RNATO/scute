@@ -4,6 +4,7 @@ from scute.internal_utils.dictToNBT import dictToNBT
 
 command_stack = []
 
+
 def command(func):
     def wrapper(*args, **kwargs):
         result = func(*args, **kwargs)
@@ -12,10 +13,12 @@ def command(func):
         elif isinstance(result, execute):
             command_stack[-1] = result.com
         return result
+
     return wrapper
 
+
 @command
-def give(player, item : Item):
+def give(player, item: Item):
     """
     Gives a player an item
     Parameters:
@@ -31,6 +34,7 @@ def give(player, item : Item):
 
     return com
 
+
 @command
 def setblock(x, y, z, block: Block):
     """
@@ -45,6 +49,7 @@ def setblock(x, y, z, block: Block):
         com += dictToNBT(block.nbt)
 
     return com
+
 
 class execute:
     def __init__(self):

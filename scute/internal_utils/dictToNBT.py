@@ -2,6 +2,7 @@ import json
 
 from scute.datatypes import NumberType
 
+
 def encode_value(value):
     out = ""
     # If the value is a NBT number like 1b, get its NBT representation
@@ -18,6 +19,7 @@ def encode_value(value):
         out += str(value)
 
     return out
+
 
 def encode_dict_or_list(obj):
     out = ""
@@ -36,7 +38,6 @@ def encode_dict_or_list(obj):
 
         out += "}"
 
-
     elif isinstance(obj, list):
         out += "["
         for value in obj:
@@ -48,12 +49,14 @@ def encode_dict_or_list(obj):
 
     return out
 
+
 class dtn(json.JSONEncoder):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def encode(self, obj):
         return encode_dict_or_list(obj)
+
 
 def dictToNBT(dic):
     return json.dumps(dic, cls=dtn)

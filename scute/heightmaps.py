@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Heightmap(Enum):
     world_surface = "world_surface"
     motion_blocking = "motion_blocking"

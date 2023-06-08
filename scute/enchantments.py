@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Enchantment(Enum):
     aqua_affinity = "aqua_affinity"
     bane_of_arthropods = "bane_of_arthropods"

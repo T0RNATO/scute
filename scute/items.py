@@ -1,8 +1,9 @@
 def nbt(**kwargs):
     return kwargs
 
+
 class Item:
-    def __init__(self, name : str, nbt: dict = None, count=1):
+    def __init__(self, name: str, nbt: dict = None, count=1):
         self.id = name
         self.nbt = nbt
         self.count = count
