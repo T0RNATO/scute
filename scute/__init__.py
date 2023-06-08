@@ -15,7 +15,10 @@ class pack:
         if pack.name != "":
             if pack.path != "":
                 bp = join(os.path.expandvars(pack.path), pack.name)
-                shutil.rmtree(bp)
+                try:
+                    shutil.rmtree(bp)
+                except:
+                    pass
                 os.makedirs(bp)
                 try:
                     with open(join(bp, "pack.mcmeta"), "w") as mcmeta:

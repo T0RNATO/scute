@@ -18,9 +18,7 @@ namespace = "myFirstDatapack"
 
 @function(namespace, "myFunction")
 def my_function():
-    give(
-        "@s",
-        Item(
+    give("@s", Item(
             Item.stone,
             count=5,
             nbt=nbt(
