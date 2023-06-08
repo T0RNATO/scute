@@ -136,3 +136,40 @@ class execute:
         """
         self.com += f" positioned {x} {y} {z}"
         return self
+
+    @command
+    def positioned_as(self, selector):
+        """
+        Sets the execution context to an entity's position
+        :param selector: The entity to set the position to
+        """
+        self.com += f" positioned as {selector}"
+        return self
+
+    @command
+    def positioned_over(self, heightmap):
+        """
+        Sets the execution context to one block above the value of a heightmap at this location
+        :param heightmap: The heightmap to use, like Heightmap.world_surface
+        """
+        self.com += f" positioned over {heightmap}"
+        return self
+
+    @command
+    def rotated(self, yaw, pitch):
+        """
+        Sets the execution context's rotation to a certain angle
+        :param yaw: The angle around the y-axis - 0 is south, ±180 is north.
+        :param pitch: The up-and-down angle - 0 is straight ahead
+        """
+        self.com += f" rotated {yaw} {pitch}"
+        return self
+
+    @command
+    def rotated_as(self, selector):
+        """
+        Sets the execution context's rotation to the same as another entity's
+        :param selector: The entity to rotate as
+        """
+        self.com += f" rotated as {selector}"
+        return self
