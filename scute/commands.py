@@ -11,7 +11,7 @@ def command(func):
         if isinstance(result, str):
             command_stack.append(result + "\n")
         elif isinstance(result, execute):
-            command_stack[-1] = result.com
+            command_stack[-1] = result.com + "\n"
         return result
 
     return wrapper
@@ -178,3 +178,12 @@ class execute:
         """
         self.com += f" rotated as {selector}"
         return self
+
+    @command
+    def run(self, cmd):
+        """
+        Runs a command with the current execution context
+        :param cmd: The command to run
+        """
+        self.com += f" run {cmd}"
+        return self.com

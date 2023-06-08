@@ -32,3 +32,5 @@ def my_function():
     )
 
     setblock(69, 33, -100, Block(Block.stone))
+
+    execute().as_("@a").at("@s").run(setblock("~", "~", "~", Block(Block.diamond_block)))
