@@ -9,7 +9,7 @@ from scute.items import nbt, Item
 pack.setName("myDatapack")
 pack.setVersion("1.19.4")
 pack.setDescription("A small pack")
-pack.setBuildPath(r"%UserProfile%\PycharmProjects\datapacks\output")
+pack.setBuildPath(r"./output")
 
 pack.build()
 

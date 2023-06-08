@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from scute.commands import command_stack
 from os.path import join
 import os, json, shutil
