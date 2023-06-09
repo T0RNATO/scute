@@ -1,7 +1,4 @@
-from enum import Enum
-
-
-class Relation(Enum):
+class Relation:
     attacker = "attacker"
     controller = "controller"
     leasher = "leasher"

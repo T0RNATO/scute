@@ -1,9 +1,8 @@
-from scute.gen.blocks import Block
+from scute.blocks import Block
 from scute.items import Item
 from scute.internal_utils.dictToNBT import dictToNBT
 
 command_stack = []
-
 
 def command(func):
     def wrapper(*args, **kwargs):
@@ -186,4 +185,134 @@ class execute:
         :param cmd: The command to run
         """
         self.com += f" run {cmd}"
+        command_stack.pop()
+        command_stack.pop()
         return self.com
+
+    class _if_clause:
+        def __init__(self, ex):
+            self.ex = ex
+            ex.com += " if"
+
+        class if_data:
+            def __init__(self, ex):
+                self.ex = ex
+                ex.com += " data"
+
+            @command
+            def block(self, x, y, z, path):
+                """
+                Checks if a certain nbt path exists in a block entity
+                :param x: The x position of the block to test
+                :param y: The y position of the block to test
+                :param z: The z position of the block to test
+                :param path: The nbt path, like `Items[{id:"minecraft:diamond"}]`
+                """
+                self.ex.com += f" block {x} {y} {z} {path}"
+                return self.ex
+
+            @command
+            def entity(self, selector, path):
+                """
+                Checks if a certain nbt path exists on an entity
+                :param selector: The entity to test
+                :param path: The nbt path, like `Invulnerable`
+                """
+                self.ex.com += f" entity {selector} {path}"
+                return self.ex
+
+            @command
+            def storage(self, storage, path):
+                """
+                Checks if a certain nbt path exists in a storage
+                :param storage: The resource location of the storage for data testing, like `namespace:storage`
+                :param path: The nbt path, like `myTag`
+                """
+                self.ex.com += f" storage {storage} {path}"
+                return self.ex
+
+        @property
+        def data(self):
+            return execute._if_clause.if_data(self.ex)
+
+        @command
+        def biome(self, x: int, y: int, z: int, biome: str):
+            """
+            Checks if the block at xyz is of a certain biome
+            :param x: The x coord of the block
+            :param y: The y coord of the block
+            :param z: The z coord of the block
+            :param biome: The biome to check for, like Biome.beach
+            """
+            self.ex.com += f" biome {x} {y} {z} {biome}"
+            return self.ex
+
+        @command
+        def blocks(self, x1: int, y1: int, z1: int, x2: int, y2: int, z2: int, x3: int, y3: int, z3: int, scanmode: str):
+            """
+            Checks if the blocks in two regions match
+            :param x1: The x-coord of the first corner of the first region
+            :param y1: The y-coord of the first corner of the first region
+            :param z1: The z-coord of the first corner of the first region
+            :param x2: The x-coord of the second corner of the first region
+            :param y2: The y-coord of the second corner of the first region
+            :param z2: The z-coord of the second corner of the first region
+            :param x3: The x-coord of the origin of the second region
+            :param y3: The y-coord of the origin of the second region
+            :param z3: The z-coord of the origin of the second region
+            :param scanmode: Whether or not air blocks should also be compared - "all" if yes, "masked" if no
+            :return:
+            """
+            self.ex.com += f" blocks {x1} {y1} {z1} {x2} {y2} {z2} {x3} {y3} {z3} {scanmode}"
+            return self.ex
+
+        @command
+        def dimension(self, dimension: str):
+            """
+            Checks if the execution context is in a certain dimension
+            :param dimension: The dimension to check for, like Dimension.overworld
+            """
+            self.ex.com += f" dimension {dimension}"
+            return self.ex
+
+        @command
+        def entity(self, selector: str):
+            """
+            Checks if at least one entity matches the selector
+            :param selector: A selector
+            """
+            self.ex.com += f" entity {selector}"
+            return self.ex
+
+        @command
+        def loaded(self, x: int, y: int, z: int):
+            """
+            Checks if a certain chunk containing the coordinate is fully loaded
+            :param x: The x-coord of a block in the chunk
+            :param y: The y-coord of a block in the chunk
+            :param z: The z-coord of a block in the chunk
+            """
+            self.ex.com += f" loaded {x} {y} {z}"
+            return self.ex
+
+        @command
+        def predicate(self, predicate: str):
+            """
+            Checks if a predicate is true, with the current execution context
+            :param predicate: A resource location of a predicate, like namespace:my_pred
+            """
+            self.ex.com += f" predicate {predicate}"
+            return self.ex
+
+    class _unless_clause(_if_clause):
+        def __init__(self, ex):
+            self.ex = ex
+            ex.com += " unless"
+
+    @property
+    def if_(self):
+        return execute._if_clause(self)
+
+    @property
+    def unless(self):
+        return execute._unless_clause(self)
