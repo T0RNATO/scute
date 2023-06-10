@@ -39,6 +39,7 @@ def my_function():
     def hi():
         give("@s", Item("hehe"))
 
-    execute().if_.block(1, 2, 3, Block(Block.gold_block)).run(
-        hi
-    )
+    execute().if_.block(1, 2, 3, Block(Block.gold_block)).run([
+        give("@s", Item("hehe")),
+        setblock("~", "~", "~", Block(Block.diamond_block))
+    ])

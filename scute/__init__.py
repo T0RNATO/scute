@@ -3,10 +3,9 @@ from __future__ import annotations
 from os.path import join
 import os, json, shutil
 
-command_stack = {
-    0: []
-}
-function_nesting_level = 0
+command_stack = [
+    []
+]
 
 class pack:
     meta = {"pack": {"pack_format": 1, "description": "My first pack"}}
@@ -63,7 +62,7 @@ class pack:
         """
         Sets the folder which your datapack will be built into - for example, "%appdata%/.minecraft/saves/world/datapacks. Should be a full path."
         """
-        pack.path = path
+        pack.path = os.path.expandvars(path)
 
 
 versions = {

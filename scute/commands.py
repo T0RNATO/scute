@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from os import makedirs
+from os.path import join
+
 from scute.blocks import Block
 from scute.items import Item
 from scute.function import function
 from scute.internal_utils.dictToNBT import dictToNBT
-from scute import command_stack, function_nesting_level
+from scute import command_stack, pack
 from types import FunctionType
 
 from uuid import uuid4
@@ -13,9 +16,9 @@ def command(func):
     def wrapper(*args, **kwargs):
         result = func(*args, **kwargs)
         if isinstance(result, str):
-            command_stack[function_nesting_level].append(result + "\n")
+            command_stack[-1].append(result + "\n")
         elif isinstance(result, execute):
-            command_stack[function_nesting_level][-1] = result.com + "\n"
+            command_stack[-1][-1] = result.com + "\n"
         return result
 
     return wrapper
@@ -58,7 +61,7 @@ def setblock(x, y, z, block: Block):
 class execute:
     def __init__(self):
         self.com = "execute"
-        command_stack[function_nesting_level].append(self.com)
+        command_stack[-1].append(self.com)
 
     @command
     def at(self, selector):
@@ -190,19 +193,38 @@ class execute:
         :param cmd: The command to run - can be a single command like give(), a list of commands, or a (non-wrapped!) function to run.
         """
 
+        # If the command is a string, meaning the return value from a command
         if isinstance(cmd, str):
+            # Add it to the end of the execute command, and remove it from the owner function
             self.com += f" run {cmd}"
-            command_stack[function_nesting_level].pop()
-        if isinstance(cmd, FunctionType):
-            name = uuid4()
-            function_nesting_level += 1
-            command_stack[function_nesting_level] = []
-            function("scute", name)(cmd)
-            del command_stack[function_nesting_level]
-            function_nesting_level -= 1
-            self.com += f" run function scute:{name}"
+            command_stack[-1].pop()
 
-        command_stack[function_nesting_level].pop()
+        # Or, if it's a function reference
+        elif isinstance(cmd, FunctionType):
+            # Generate a name for the function
+            name = uuid4()
+            self.com += f" run function scute:{name}"
+            # Run the function as if it was decorated with @function, generating a file
+            command_stack.append([])
+            function("scute", name)(cmd)
+            # Delete that output
+            del command_stack[-1]
+
+        # Or, if it's a list of commands
+        elif isinstance(cmd, list):
+            name = uuid4()
+            self.com += f" run function scute:{name}"
+            # Create a file
+            bp = join(pack.path, pack.name)
+            bp = join(bp, rf"data\scute\functions")
+            makedirs(bp)
+            with open(join(bp, rf"{name}.mcfunction"), "w") as f:
+                # And add the last x values from the command stack to the file, where x is len(cmd)
+                f.writelines(command_stack[-1][-len(cmd):])
+            # Then remove those x values from the stack
+            del command_stack[-1][-len(cmd):]
+
+        command_stack[-1].pop()
         return self.com
 
     class _if_clause:
