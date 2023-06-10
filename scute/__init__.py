@@ -6,6 +6,7 @@ import os, json, shutil
 command_stack = [
     []
 ]
+function_namespaces = {}
 
 class pack:
     meta = {"pack": {"pack_format": 1, "description": "My first pack"}}
@@ -21,7 +22,7 @@ class pack:
                     shutil.rmtree(bp)
                 except:
                     pass
-                os.makedirs(bp)
+                os.makedirs(bp, exist_ok=True)
                 try:
                     with open(join(bp, "pack.mcmeta"), "w") as mcmeta:
                         json.dump(pack.meta, mcmeta, indent=4)
@@ -30,7 +31,7 @@ class pack:
                     print(e)
                     return
 
-                os.makedirs(os.path.join(bp, "data"))
+                os.makedirs(os.path.join(bp, "data"), exist_ok=True)
 
             else:
                 print("Please set a path to compile to with scute.pack.setBuildPath()")

@@ -5,10 +5,11 @@ from os.path import join
 
 from scute.blocks import Block
 from scute.items import Item
-from scute.function import function
+from scute.function import func
 from scute.internal_utils.dictToNBT import dictToNBT
-from scute import command_stack, pack
+from scute import command_stack, pack, function_namespaces
 from types import FunctionType
+from typing import Callable
 
 from uuid import uuid4
 
@@ -56,6 +57,18 @@ def setblock(x, y, z, block: Block):
         com += dictToNBT(block.nbt)
 
     return com
+
+
+@command
+def function(funct: Callable | str):
+    """
+    Runs another function
+    :param funct: A function reference, or a resource location for a function, like mypack:func1
+    """
+    if isinstance(funct, FunctionType):
+        return f"function {function_namespaces[funct]}"
+    elif isinstance(funct, str):
+        return f"function {funct}"
 
 
 class execute:
@@ -201,27 +214,34 @@ class execute:
 
         # Or, if it's a function reference
         elif isinstance(cmd, FunctionType):
-            # Generate a name for the function
-            name = uuid4()
-            self.com += f" run function scute:{name}"
-            # Run the function as if it was decorated with @function, generating a file
-            command_stack.append([])
-            function("scute", name)(cmd)
-            # Delete that output
-            del command_stack[-1]
+            if cmd not in function_namespaces:
+                # Generate a name for the function
+                name = uuid4()
+                self.com += f" run function scute:{name}"
+                # Run the function as if it was decorated with @function, generating a file
+                command_stack.append([])
+                func("scute", name)(cmd)
+                # Delete that output
+                del command_stack[-1]
+            else:
+                self.com += f" run function scute:{function_namespaces[cmd]}"
 
         # Or, if it's a list of commands
         elif isinstance(cmd, list):
             name = uuid4()
             self.com += f" run function scute:{name}"
+
             # Create a file
             bp = join(pack.path, pack.name)
             bp = join(bp, rf"data\scute\functions")
-            makedirs(bp)
+            makedirs(bp, exist_ok=True)
+
+            function_namespaces[function] = f"scute:{name}"
+
             with open(join(bp, rf"{name}.mcfunction"), "w") as f:
-                # And add the last x values from the command stack to the file, where x is len(cmd)
+                # And add the last n values from the command stack to the file, where n is len(cmd)
                 f.writelines(command_stack[-1][-len(cmd):])
-            # Then remove those x values from the stack
+            # Then remove those values from the stack
             del command_stack[-1][-len(cmd):]
 
         command_stack[-1].pop()

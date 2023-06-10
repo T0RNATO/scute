@@ -1,9 +1,8 @@
 from scute import pack
-from scute.biomes import Biome
 from scute.commands import *
 from scute.datatypes import Byte
 from scute.enchantments import Enchantment
-from scute.function import function
+from scute.function import func
 from scute.blocks import Block
 from scute.items import nbt, Item
 
@@ -16,8 +15,12 @@ pack.build()
 
 namespace = "myFirstDatapack"
 
+# Will be assigned a randomly-generated name, under the `scute` namespace
+@func()
+def my_anonymous_function():
+    give("@s", Item(Item.diamond))
 
-@function(namespace, "myFunction")
+@func(namespace, "myFunction")
 def my_function():
     give("@s", Item(
             Item.stone,
@@ -31,13 +34,7 @@ def my_function():
             ),
         ),
     )
-
-    setblock(69, 33, -100, Block(Block.stone))
-
-    execute().as_("@a").at("@s").run(setblock("~", "~", "~", Block(Block.diamond_block)))
-
-    def hi():
-        give("@s", Item("hehe"))
+    function(my_anonymous_function)
 
     execute().if_.block(1, 2, 3, Block(Block.gold_block)).run([
         give("@s", Item("hehe")),
