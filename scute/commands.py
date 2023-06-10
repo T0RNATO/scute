@@ -1,16 +1,21 @@
+from __future__ import annotations
+
 from scute.blocks import Block
 from scute.items import Item
+from scute.function import function
 from scute.internal_utils.dictToNBT import dictToNBT
+from scute import command_stack, function_nesting_level
+from types import FunctionType
 
-command_stack = []
+from uuid import uuid4
 
 def command(func):
     def wrapper(*args, **kwargs):
         result = func(*args, **kwargs)
         if isinstance(result, str):
-            command_stack.append(result + "\n")
+            command_stack[function_nesting_level].append(result + "\n")
         elif isinstance(result, execute):
-            command_stack[-1] = result.com + "\n"
+            command_stack[function_nesting_level][-1] = result.com + "\n"
         return result
 
     return wrapper
@@ -53,7 +58,7 @@ def setblock(x, y, z, block: Block):
 class execute:
     def __init__(self):
         self.com = "execute"
-        command_stack.append(self.com)
+        command_stack[function_nesting_level].append(self.com)
 
     @command
     def at(self, selector):
@@ -179,14 +184,25 @@ class execute:
         return self
 
     @command
-    def run(self, cmd):
+    def run(self, cmd: str | list | FunctionType):
         """
-        Runs a command with the current execution context
-        :param cmd: The command to run
+        Runs a command or function with the current execution context
+        :param cmd: The command to run - can be a single command like give(), a list of commands, or a (non-wrapped!) function to run.
         """
-        self.com += f" run {cmd}"
-        command_stack.pop()
-        command_stack.pop()
+
+        if isinstance(cmd, str):
+            self.com += f" run {cmd}"
+            command_stack[function_nesting_level].pop()
+        if isinstance(cmd, FunctionType):
+            name = uuid4()
+            function_nesting_level += 1
+            command_stack[function_nesting_level] = []
+            function("scute", name)(cmd)
+            del command_stack[function_nesting_level]
+            function_nesting_level -= 1
+            self.com += f" run function scute:{name}"
+
+        command_stack[function_nesting_level].pop()
         return self.com
 
     class _if_clause:
@@ -245,6 +261,18 @@ class execute:
             :param biome: The biome to check for, like Biome.beach
             """
             self.ex.com += f" biome {x} {y} {z} {biome}"
+            return self.ex
+
+        @command
+        def block(self, x, y, z, block: Block):
+            """
+            Checks if a certain block is at a certain set of coordinates
+            :param x: The x position of the block
+            :param y: The y position of the block
+            :param z: The z position of the block
+            :param block: The block, like `Block(Block.dirt)`
+            """
+            self.ex.com += f" block {x} {y} {z} {block.id}"
             return self.ex
 
         @command

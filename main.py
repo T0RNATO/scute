@@ -36,4 +36,9 @@ def my_function():
 
     execute().as_("@a").at("@s").run(setblock("~", "~", "~", Block(Block.diamond_block)))
 
-    execute().unless.block(1, 2, 3, Block.gold_block).run(give("@s", Item("hehe")))
+    def hi():
+        give("@s", Item("hehe"))
+
+    execute().if_.block(1, 2, 3, Block(Block.gold_block)).run(
+        hi
+    )

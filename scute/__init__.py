@@ -1,9 +1,12 @@
 from __future__ import annotations
 
-from scute.commands import command_stack
 from os.path import join
 import os, json, shutil
 
+command_stack = {
+    0: []
+}
+function_nesting_level = 0
 
 class pack:
     meta = {"pack": {"pack_format": 1, "description": "My first pack"}}

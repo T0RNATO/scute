@@ -1,4 +1,4 @@
-from scute import command_stack, pack
+from scute import command_stack, pack, function_nesting_level
 from os.path import join
 import os
 
@@ -13,7 +13,7 @@ def function(function_namespace, function_name):
         os.makedirs(bp)
 
         with open(join(bp, rf"{function_name}.mcfunction"), "w") as f:
-            f.writelines(command_stack)
+            f.writelines(command_stack[function_nesting_level])
         return func
 
     return decorator
