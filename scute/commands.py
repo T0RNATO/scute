@@ -63,7 +63,7 @@ def setblock(x, y, z, block: Block):
 def function(funct: Callable | str):
     """
     Runs another function
-    :param funct: A function reference, or a resource location for a function, like mypack:func1
+    :param funct: A (@func wrapped) function reference, or a resource location for a function, like mypack:func1
     """
     if isinstance(funct, FunctionType):
         return f"function {function_namespaces[funct]}"
@@ -217,26 +217,26 @@ class execute:
             if cmd not in function_namespaces:
                 # Generate a name for the function
                 name = uuid4()
-                self.com += f" run function scute:{name}"
+                self.com += f" run function {pack.namespace}:{name}"
                 # Run the function as if it was decorated with @function, generating a file
                 command_stack.append([])
-                func("scute", name)(cmd)
+                func(pack.namespace, name)(cmd)
                 # Delete that output
                 del command_stack[-1]
             else:
-                self.com += f" run function scute:{function_namespaces[cmd]}"
+                self.com += f" run function {pack.namespace}:{function_namespaces[cmd]}"
 
         # Or, if it's a list of commands
         elif isinstance(cmd, list):
             name = uuid4()
-            self.com += f" run function scute:{name}"
+            self.com += f" run function {pack.namespace}:{name}"
 
             # Create a file
             bp = join(pack.path, pack.name)
-            bp = join(bp, rf"data\scute\functions")
+            bp = join(bp, rf"data\{pack.namespace}\functions")
             makedirs(bp, exist_ok=True)
 
-            function_namespaces[function] = f"scute:{name}"
+            function_namespaces[function] = f"{pack.namespace}:{name}"
 
             with open(join(bp, rf"{name}.mcfunction"), "w") as f:
                 # And add the last n values from the command stack to the file, where n is len(cmd)

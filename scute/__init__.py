@@ -12,6 +12,7 @@ class pack:
     meta = {"pack": {"pack_format": 1, "description": "My first pack"}}
     name = ""
     path = ""
+    namespace = "scute"
 
     @staticmethod
     def build():
@@ -43,6 +44,14 @@ class pack:
     @staticmethod
     def setName(name):
         pack.name = name
+
+    @staticmethod
+    def setMainNamespace(namespace):
+        """
+        Sets the namespace that will be used for automatically-generated or anonymous functions
+        :param namespace: The namespace
+        """
+        pack.namespace = namespace
 
     @staticmethod
     def setDescription(desc: str):

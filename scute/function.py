@@ -5,15 +5,16 @@ from os.path import join
 import os
 
 
-def func(function_namespace = "scute", function_name = None):
+def func(function_namespace = None, function_name = None):
     def decorator(function):
         function()
         name = function_name or uuid4()
+        space = function_namespace or pack.namespace
 
-        function_namespaces[function] = f"{function_namespace}:{name}"
+        function_namespaces[function] = f"{space}:{name}"
 
         bp = join(pack.path, pack.name)
-        bp = join(bp, rf"data\{function_namespace}\functions")
+        bp = join(bp, rf"data\{space}\functions")
 
         os.makedirs(bp, exist_ok=True)
 

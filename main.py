@@ -11,11 +11,13 @@ pack.setVersion("1.19.4")
 pack.setDescription("A small pack")
 pack.setBuildPath(r"./output")
 
-pack.build()
-
 namespace = "myFirstDatapack"
 
-# Will be assigned a randomly-generated name, under the `scute` namespace
+pack.setMainNamespace(namespace)
+
+pack.build()
+
+# Will be assigned a randomly-generated name, under the namespace set in pack.setMainNamespace, or under "scute"
 @func()
 def my_anonymous_function():
     give("@s", Item(Item.diamond))
