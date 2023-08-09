@@ -1,11 +1,9 @@
-from __future__ import annotations
-
+import json
+import os
+import shutil
 from os.path import join
-import os, json, shutil
 
-command_stack = [
-    []
-]
+command_stack = [[]]
 function_namespaces = {}
 
 class pack:
@@ -70,7 +68,7 @@ class pack:
     @staticmethod
     def setBuildPath(path: str):
         """
-        Sets the folder which your datapack will be built into - for example, "%appdata%/.minecraft/saves/world/datapacks. Should be a full path."
+        Sets the folder which your datapack will be built into - for example, "%appdata%/.minecraft/saves/world/datapacks", or "./output"
         """
         pack.path = os.path.expandvars(path)
 
@@ -92,4 +90,6 @@ versions = {
     "1.19.2": 10,
     "1.19.3": 10,
     "1.19.4": 12,
+    "1.20": 15,
+    "1.20.1": 15,
 }

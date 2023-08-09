@@ -1,25 +1,30 @@
-from __future__ import annotations
-
 from os import makedirs
 from os.path import join
 
 from scute.blocks import Block
 from scute.items import Item
-from scute.function import func
+from scute.function import func, MacroArg
 from scute.internal_utils.dictToNBT import dictToNBT
 from scute import command_stack, pack, function_namespaces
 from types import FunctionType
-from typing import Callable
 
 from uuid import uuid4
 
 def command(func):
-    def wrapper(*args, **kwargs):
-        result = func(*args, **kwargs)
+    def wrapper(*args):
+        # TODO: pass macro args to commands somehow as strings/obj when needed
+        macro = any(isinstance(arg, MacroArg) for arg in args)
+        result = func(*args)
         if isinstance(result, str):
-            command_stack[-1].append(result + "\n")
+            c = result + "\n"
+            if macro:
+                c = "$" + c
+            command_stack[-1].append(c)
         elif isinstance(result, execute):
-            command_stack[-1][-1] = result.com + "\n"
+            c = result.com + "\n"
+            if macro:
+                c = "$" + c
+            command_stack[-1][-1] = c
         return result
 
     return wrapper
@@ -60,15 +65,12 @@ def setblock(x, y, z, block: Block):
 
 
 @command
-def function(funct: Callable | str):
+def function(funct: str):
     """
-    Runs another function
-    :param funct: A (@func wrapped) function reference, or a resource location for a function, like mypack:func1
+    Runs another function. Alternatively, just call it like functionName()
+    :param funct: A resource location for a function, like mypack:func1
     """
-    if isinstance(funct, FunctionType):
-        return f"function {function_namespaces[funct]}"
-    elif isinstance(funct, str):
-        return f"function {funct}"
+    return f"function {funct}"
 
 
 class execute:
@@ -330,7 +332,7 @@ class execute:
             :param x3: The x-coord of the origin of the second region
             :param y3: The y-coord of the origin of the second region
             :param z3: The z-coord of the origin of the second region
-            :param scanmode: Whether or not air blocks should also be compared - "all" if yes, "masked" if no
+            :param scanmode: Whether air blocks should also be compared - "all" if yes, "masked" if no
             :return:
             """
             self.ex.com += f" blocks {x1} {y1} {z1} {x2} {y2} {z2} {x3} {y3} {z3} {scanmode}"
