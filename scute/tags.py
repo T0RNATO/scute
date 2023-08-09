@@ -1,11 +1,27 @@
 import atexit
-from scute import function_namespaces
+import json
+import os
+from os.path import join
+
+from scute import function_namespaces, pack
 
 # tags = {tag_namespace: [function_namespace, ...]}
 tags = {}
 
 def createTagFiles():
-    print(tags)
+    for tag, functions in tags.items():
+        namespace, name = tag.split(":")
+        path = join(pack.path, pack.name)
+        path = join(path, rf"data\{namespace}\tags\functions")
+
+        os.makedirs(path, exist_ok=True)
+
+        with open(join(path, rf"{name}.json"), "w") as f:
+            json.dump({
+                "values": [
+                    func for func in functions
+                ]
+            }, f, indent=4)
 
 
 atexit.register(createTagFiles)
