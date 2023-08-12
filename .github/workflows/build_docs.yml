@@ -15,7 +15,6 @@ permissions:
   id-token: write
 
 
-
 jobs:
   build:
 
@@ -27,12 +26,12 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: "3.11"
+    - name: Install requirements
+      run: |
+        pip install pdoc3
     - name: Build docs
       run: |
         pdoc scute --html
-    - name: Test with pytest
-      run: |
-        pytest
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v2
       with:
