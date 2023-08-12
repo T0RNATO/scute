@@ -58,6 +58,10 @@
         background: black;
     }
 
+    img.logo {
+        filter: invert(100%);
+    }
+
     body {
         background: white;
     }
