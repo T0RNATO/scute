@@ -11,12 +11,9 @@ permissions:
   pages: write
   id-token: write
 
-
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.11
@@ -28,7 +25,7 @@ jobs:
         pip install pdoc3
     - name: Build docs
       run: |
-        pdoc scute --html --template-dir scute/pdoc/config
+        pdoc scute --html --template-dir pdoc/config
     - name: Copy assets
       run: |
         cp -r assets html/scute/assets

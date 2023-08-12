@@ -1,6 +1,7 @@
 """
 Scute is a Python package designed to make making Minecraft datapacks easier. It allows you to create
 almost all elements of a datapack with pure code (eventually - at the moment it's just functions and recipes).
+.. include:: ../pdoc/documentation/index.md
 """
 
 import json

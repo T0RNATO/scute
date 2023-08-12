@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project.urls]
+documentation = "https://t0rnato.github.io/scute"
+repository = "https://github.com/T0RNATO/scute"
+
+[project]
+name = "scutemc"
+version = "0.0.1"
+description = "A Python library for making Minecraft datapacks."
+requires-python = ">=3.11"
+readme = "README.md"
+
+[tool.setuptools.package-dir]
+scute = "scute"

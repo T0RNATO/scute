@@ -59,7 +59,7 @@
     }
 
     img.logo {
-        filter: invert(100%);
+        filter: invert(100%) saturate(140%);
     }
 
     body {

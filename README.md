@@ -2,4 +2,4 @@
 
 A simple Python library for creating Minecraft datapacks with Python. (Very much in development)
 
-Thanks to [SleepyStew](https://github.com/SleepyStew) for part of the idea.
+[Read the docs](https://t0rnato.github.io/scute)
