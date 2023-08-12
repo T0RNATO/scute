@@ -1,10 +1,18 @@
-**[View the Github](https://github.com/T0RNATO/scute)**
+**[View the Github](https://github.com/T0RNATO/scute) or [the PyPi listing](https://pypi.org/project/scutemc/)**
 ## Usage
 Install the package by doing the following:
 ```bash
 pip install scutemc
 ```
-Then, import the package:
+Then, use the package:
 ```python
-import scute
+from scute.function import func
+from scute.items import Item
+from scute.commands import give
+
+@func("namespace", "name")
+def myFunc():
+    give("@s", Item.green_dye)
 ```
+
+Recommended reading to start off: `scute.function`
