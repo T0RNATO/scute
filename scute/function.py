@@ -35,7 +35,7 @@ def func(function_namespace=None, function_name=None):
         function_namespace: The namespace your function should go under
         function_name: The name of your function
 
-    .. include:: ./documentation/functions.md
+    .. include:: ./pdoc/documentation/functions.md
     """
     def decorator(function):
         if function not in _function_namespaces:

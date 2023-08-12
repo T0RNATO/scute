@@ -28,7 +28,7 @@ jobs:
         pip install pdoc3
     - name: Build docs
       run: |
-        pdoc scute --html
+        pdoc scute --html --template-dir scute/pdoc/config
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v2
       with:
