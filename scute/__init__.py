@@ -1,10 +1,15 @@
+"""
+Scute is a Python package designed to make making Minecraft datapacks easier. It allows you to create
+almost all elements of a datapack with pure code (eventually, rn it's just functions 💀)
+"""
+
 import json
 import os
 import shutil
 from os.path import join
 
-command_stack = [[]]
-function_namespaces = {}
+_command_stack = [[]]
+_function_namespaces = {}
 
 class pack:
     meta = {"pack": {"pack_format": 1, "description": "My first pack"}}
@@ -14,6 +19,9 @@ class pack:
 
     @staticmethod
     def build():
+        """
+        Checks the validity of your pack, and creates the file structure. Must be run at the top of the file after you define pack.name, etc
+        """
         if pack.name != "":
             if pack.path != "":
                 bp = join(os.path.expandvars(pack.path), pack.name)
@@ -41,27 +49,40 @@ class pack:
 
     @staticmethod
     def setName(name):
+        """
+        Sets the display name of the pack
+        Args:
+            name: The name
+        """
         pack.name = name
 
     @staticmethod
     def setMainNamespace(namespace):
         """
         Sets the namespace that will be used for automatically-generated or anonymous functions
-        :param namespace: The namespace
+        Args:
+            namespace: The namespace
         """
         pack.namespace = namespace
 
     @staticmethod
     def setDescription(desc: str):
+        """
+        Sets the description of your pack
+        Args:
+            desc: The description
+        """
         pack.meta["pack"]["description"] = desc
 
     @staticmethod
     def setVersion(version: str | int):
         """
-        :param version: Can be a major release like "1.19.4" (goes back to 1.16) or a pack_format number like 11
+        Sets the version that the pack supports
+        Args:
+            version: Can be a major release like "1.19.4" (goes back to 1.16) or a pack_format number like 11
         """
         if isinstance(version, str):
-            pack.meta["pack"]["pack_format"] = versions[version]
+            pack.meta["pack"]["pack_format"] = _versions[version]
         else:
             pack.meta["pack"]["pack_format"] = version
 
@@ -73,7 +94,12 @@ class pack:
         pack.path = os.path.expandvars(path)
 
 
-versions = {
+class _JsonText:
+    def __init__(self, text):
+        self.text = text
+
+
+_versions = {
     "1.16": 5,
     "1.16.1": 5,
     "1.16.2": 6,

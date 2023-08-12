@@ -1,3 +1,6 @@
+"""
+Enum and class for blocks.
+"""
 class Block:
     def __init__(self, name: str, nbt: dict = None):
         self.id = name

@@ -1,3 +1,6 @@
+"""
+Enum for all heightmaps in Minecraft.
+"""
 class Heightmap:
     world_surface = "world_surface"
     motion_blocking = "motion_blocking"

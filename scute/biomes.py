@@ -1,3 +1,6 @@
+"""
+Enum for all biomes in Minecraft.
+"""
 class Biome:
     badlands = "badlands"
     badlands_plateau = "badlands_plateau"

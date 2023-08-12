@@ -1,4 +1,7 @@
-class NumberType:
+"""
+Various data types used in NBT.
+"""
+class _NumberType:
     letter = None
     int = False
 
@@ -12,24 +15,24 @@ class NumberType:
         return str(self.number) + self.letter
 
 
-class Byte(NumberType):
+class Byte(_NumberType):
     letter = "b"
     int = True
 
 
-class Long(NumberType):
+class Long(_NumberType):
     letter = "l"
     int = True
 
 
-class Short(NumberType):
+class Short(_NumberType):
     letter = "s"
     int = True
 
 
-class Float(NumberType):
+class Float(_NumberType):
     letter = "f"
 
 
-class Double(NumberType):
+class Double(_NumberType):
     letter = "d"

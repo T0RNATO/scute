@@ -1,10 +1,35 @@
+"""
+Enum for item types, and a class for creating items.
+"""
+from scute import _JsonText
+
 def nbt(**kwargs):
+    """
+    An optional pretty-print way to define nbt data - `nbt(mytag=Byte(1))` is the same as `{"mytag": Byte(1)}`
+    """
     return kwargs
 
 
 class Item:
-    def __init__(self, name: str, nbt: dict = None, count=1):
-        self.id = name
+    def __init__(self, id: str, nbt: dict = None, count=1, name: _JsonText | str = None):
+        """
+        Creates an item instance. Nbt can be specified manually with nbt= or using a utility, like name=
+        Args:
+            id: The id of the item, like Item.diamond
+            nbt: Optional nbt for the item, like nbt(mytag=Byte(1))
+            count: Optional count
+            name: Utility for setting the name of the item
+        """
+        if ":" in id:
+            self.id = id
+        else:
+            self.id = "minecraft:" + id
+        if name is not None:
+            if nbt is None:
+                nbt = {}
+            if "display" not in nbt:
+                nbt["display"] = {}
+            nbt["display"]["Name"] = name
         self.nbt = nbt
         self.count = count
 

@@ -1,5 +1,7 @@
+"""
+Submodule for data sources, like block entities, entities, and storage - eventually to be used in /data etc
+"""
 from scute import pack
-
 
 class DataSource:
     pass

@@ -1,12 +1,12 @@
 import json
 
-from scute.datatypes import NumberType
+from scute.datatypes import _NumberType
 
 
 def encode_value(value):
     out = ""
     # If the value is a NBT number like 1b, get its NBT representation
-    if issubclass(type(value), NumberType):
+    if issubclass(type(value), _NumberType):
         out += value.getNbt()
     # If the value is a dict or list, encode it
     elif isinstance(value, dict) or isinstance(value, list):
