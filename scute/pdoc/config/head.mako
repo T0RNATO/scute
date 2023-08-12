@@ -1,2 +1,2 @@
 <link rel="shortcut icon" href="/scute/assets/favicon.ico" type="image/x-icon">
-<link rel="stylesheet" href="https://github.com/T0RNATO/scute/blob/dc6d48586cdcbccdf2570204e6133de36c7af52b/scute/pdoc/css/darkmode.css">
+<link rel="stylesheet" href="/scute/assets/darkmode.css">

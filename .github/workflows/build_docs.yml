@@ -29,14 +29,13 @@ jobs:
     - name: Build docs
       run: |
         pdoc scute --html --template-dir scute/pdoc/config
+    - name: Copy assets
+      run: |
+        cp -r assets html/scute/assets
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v2
       with:
        path: ./html/scute
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v2
-      with:
-        path: './assets'
   deploy:
     environment:
       name: github-pages
