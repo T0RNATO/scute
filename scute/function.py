@@ -8,6 +8,8 @@ from inspect import signature
 from typing import TypeVar
 import os
 
+from scute.internal.utils import formatText
+
 _NbtSource = TypeVar('_NbtSource', bound=DataSource)
 
 class _MacroArguments:
@@ -59,8 +61,9 @@ def func(function_namespace=None, function_name=None):
 
             _command_stack[-1] = []
 
-            print(f"Successfully registered function {space}:{name}")
+            print(formatText(f"Created function {space}:{name}", 32))
 
+        # Code run if the function is called
         def wrapper(args: dict | _NbtSource = None, path=None):
             command = f"function {_function_namespaces[function]}"
             if isinstance(args, dict):

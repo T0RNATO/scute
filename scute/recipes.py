@@ -3,7 +3,7 @@ Submodule for creating and managing recipes - shaped crafting, smelting, etc.
 """
 from typing import TypeVar
 
-from scute.internal.utils import _createJsonFile
+from scute.internal.utils import _createJsonFile, formatText
 from scute.tags import ItemTag
 
 class Recipe:
@@ -167,4 +167,4 @@ _Recipe = TypeVar('_Recipe', bound=Recipe)
 
 def registerRecipe(recipe: _Recipe, namespace: str, name: str):
     _createJsonFile(namespace, name, r"recipes", recipe.json)
-    print(f"Successfully registered recipe {namespace}:{name}")
+    print(formatText(f"Created recipe {namespace}:{name}", 32))

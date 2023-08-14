@@ -10,7 +10,12 @@ def _createJsonFile(namespace, name, p, data):
 
     os.makedirs(path, exist_ok=True)
 
-    print(path)
-
     with open(join(path, name + ".json"), "w") as f:
         json.dump(data, f, indent=4)
+
+def formatText(text, *codes):
+    out = ""
+    for code in codes:
+        out += f"\033[{code}m"
+    out += text
+    return out + "\033[0m"

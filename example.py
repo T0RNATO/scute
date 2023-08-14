@@ -35,7 +35,7 @@ def my_function():
     my_anonymous_function()
 
     execute().if_.block(1, 2, 3, Block(Block.gold_block)).run([
-        give("@s", Item(Item.acacia_boat)),
+        give("@s", Item.acacia_boat),
         setblock("~", "~", "~", Block(Block.diamond_block))
     ])
 

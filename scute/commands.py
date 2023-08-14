@@ -15,32 +15,38 @@ from uuid import uuid4
 from functools import wraps
 
 functionArg = str | list | FunctionType
+lastCommandWasExecute = False
 
 
 def _command(funct):
     @wraps(funct)
     def wrapper(*args):
-        # TODO: pass macro args to commands somehow as strings/obj when needed
-        macro = any(isinstance(arg, _MacroArg) for arg in args)
+        macro: bool = any(isinstance(arg, _MacroArg) for arg in args)
         result = funct(*args)
+        global lastCommandWasExecute
         if isinstance(result, str):
+            if lastCommandWasExecute:
+                print("del!", result)
+                del _command_stack[-1]
+            lastCommandWasExecute = False
             c = result + "\n"
             if macro:
                 c = "$" + c
+            print(_command_stack, "34")
             _command_stack[-1].append(c)
         elif isinstance(result, execute):
+            lastCommandWasExecute = True
             c = result.com + "\n"
             if macro:
                 c = "$" + c
-            _command_stack[-1][-1] = c
+            # Overwrite command written by previous subcommand with new value
+            _command_stack[-2][-1] = c
         return result
 
     return wrapper
 
 
 def _functionArgument(cmd: functionArg, single_command_allowed: bool):
-    _command_stack.append([])
-
     result = "" if single_command_allowed else "function "
 
     # If the command is a string, meaning the return value from a command
@@ -72,8 +78,6 @@ def _functionArgument(cmd: functionArg, single_command_allowed: bool):
             # Write the commands to the file
             f.writelines(_command_stack[-1])
 
-    del _command_stack[-1]
-
     return result
 
 
@@ -90,9 +94,7 @@ def give(player, item: Item | str):
     elif isinstance(item, str):
         return f"give {player} {item}"
 
-    com = f"give {player} {item.id}"
-    if item.nbt is not None:
-        com += dictToNBT(item.nbt)
+    com = f"give {player} {item.commandFormat}"
 
     if item.count != 1:
         com += " " + str(item.count)
@@ -146,8 +148,11 @@ def schedule(cmd: functionArg, time: int, units: str = "t"):
 
 class execute:
     def __init__(self):
+        print(_command_stack, "150")
         self.com = "execute"
         _command_stack[-1].append(self.com)
+        _command_stack.append([])
+        print(_command_stack, "154")
 
     @_command
     def at(self, selector):
@@ -294,6 +299,7 @@ class execute:
         """
         self.com += " run "
         self.com += _functionArgument(cmd, True)
+        del _command_stack[-1]
         return self.com
 
     class _if_clause:

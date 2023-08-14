@@ -2,10 +2,12 @@
 Enum for item types, and a class for creating items.
 """
 from scute import _JsonText
+from scute.internal.dictToNBT import dictToNBT
 
 def nbt(**kwargs):
     """
     An optional pretty-print way to define nbt data - `nbt(mytag=Byte(1))` is the same as `{"mytag": Byte(1)}`
+    .. include:: ../pdoc/documentation/nbt.md
     """
     return kwargs
 
@@ -16,7 +18,7 @@ class Item:
         Creates an item instance. Nbt can be specified manually with nbt= or using a utility, like name=
         Args:
             id: The id of the item, like Item.diamond
-            nbt: Optional nbt for the item, like nbt(mytag=Byte(1))
+            nbt: Optional nbt for the item, like nbt(mytag=Byte(1)) or {"CustomModelData": 3}
             count: Optional count
             name: Utility for setting the name of the item
         """
@@ -29,8 +31,9 @@ class Item:
                 nbt = {}
             if "display" not in nbt:
                 nbt["display"] = {}
-            nbt["display"]["Name"] = name
+            nbt["display"]["Name"] = str(name)
         self.nbt = nbt
+        self.commandFormat = self.id + dictToNBT(nbt)
         self.count = count
 
     acacia_boat = "acacia_boat"

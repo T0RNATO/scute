@@ -96,8 +96,11 @@ class pack:
 
 
 class _JsonText:
-    def __init__(self, text):
+    def __init__(self, text: dict):
         self.text = text
+
+    def __str__(self):
+        return json.dumps(self.text)
 
 
 _versions = {

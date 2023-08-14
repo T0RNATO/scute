@@ -13,9 +13,10 @@ def encode_value(value):
         out += encode_dict_or_list(value)
     # If the value is a string, just add it
     elif isinstance(value, str):
-        out += f'"{value}"'
+        escapedValue = value.replace("'", "\\'")
+        out += f"'{escapedValue}'"
     # If the value is an int, just add it
-    elif isinstance(value, int):
+    elif isinstance(value, int) or isinstance(value, float):
         out += str(value)
 
     return out

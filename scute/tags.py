@@ -1,14 +1,13 @@
 """
 Submodule for creating and managing tags - function tags, block tags, item tags, etc.
 """
-
 import atexit
 import json
 import os
 from os.path import join
 
 from scute import _function_namespaces, pack
-from scute.internal.utils import _createJsonFile
+from scute.internal.utils import _createJsonFile, formatText
 
 _tags = {}
 
@@ -20,9 +19,9 @@ def _createFunctionTagFiles():
                     func for func in functions
                 ]
             })
-        print(f"Successfully created function tag {namespace}:{name}")
+        print(formatText(f"Successfully created function tag {namespace}:{name}", 32))
 
-    print("Built!")
+    print(formatText("Built!", 42, 30))
 
 
 atexit.register(_createFunctionTagFiles)

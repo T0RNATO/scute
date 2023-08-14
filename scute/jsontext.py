@@ -1,5 +1,5 @@
 """
-Submodule for json-formatted text, like in /tellraw or item names etc
+Submodule for json-formatted text, used in /tellraw or item names etc
 """
 from scute import _JsonText
 from scute.internal.dictToNBT import dictToNBT
@@ -38,7 +38,7 @@ def JSONText(string: str,
         hover_item: The item that is shown when the text is hovered
         hover_entity: The entity that is shown when the text is hovered - e.g. {"type":"pig", "id":"0-0-0-0"}. json-formatted `name` field is optional.
     Returns:
-        An JsonText instance, to be passed into various functions
+        A JsonText instance, to be passed into various functions
     """
     optionalArgs = {
         "strikethrough": strikethrough,
@@ -93,6 +93,9 @@ def JSONText(string: str,
 
 
 class Colour:
+    """
+    An enum of all the colours in the base game. Colour.red is the exact same as "red"
+    """
     black = "black"
     dark_blue = "dark_blue"
     dark_green = "dark_green"

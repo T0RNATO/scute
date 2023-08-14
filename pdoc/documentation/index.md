@@ -15,4 +15,4 @@ def myFunc():
     give("@s", Item.green_dye)
 ```
 
-Recommended reading to start off: `scute.function`
+Recommended reading to start off: `scute.function`, `scute.item`
