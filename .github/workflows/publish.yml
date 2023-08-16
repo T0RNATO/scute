@@ -49,9 +49,7 @@ jobs:
       run: poetry version ${{ steps.tag_version.outputs.new_tag }}
 
     - name: Build
-      run: |
-        cd /scute
-        poetry build
+      run: cd ./scute && poetry build
 
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
