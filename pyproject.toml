@@ -21,6 +21,6 @@ authors = [
 ]
 documentation = "https://t0rnato.github.io/scute"
 repository = "https://github.com/T0RNATO/scute"
-
-[tool.poetry.packages]
-include = "scute"
+packages = [
+    {include = "scute"}
+]
