@@ -8,39 +8,31 @@ from scute.blocks import Block
 from scute.items import Item
 from scute.function import func, _MacroArg
 from scute.internal.dictToNBT import dictToNBT
-from scute import _command_stack, pack, _function_namespaces
+from scute import pack, _function_namespaces
 from types import FunctionType
 
 from uuid import uuid4
 from functools import wraps
 
 functionArg = str | list | FunctionType
-lastCommandWasExecute = False
-
 
 def _command(funct):
     @wraps(funct)
     def wrapper(*args):
         macro: bool = any(isinstance(arg, _MacroArg) for arg in args)
         result = funct(*args)
-        global lastCommandWasExecute
         if isinstance(result, str):
-            if lastCommandWasExecute:
-                print("del!", result)
-                del _command_stack[-1]
-            lastCommandWasExecute = False
             c = result + "\n"
             if macro:
                 c = "$" + c
-            print(_command_stack, "34")
-            _command_stack[-1].append(c)
+            print(pack._command_stack, "34")
+            pack._command_stack.append(c)
         elif isinstance(result, execute):
-            lastCommandWasExecute = True
             c = result.com + "\n"
             if macro:
                 c = "$" + c
             # Overwrite command written by previous subcommand with new value
-            _command_stack[-2][-1] = c
+            pack._command_stack[-1] = c
         return result
 
     return wrapper
@@ -51,7 +43,11 @@ def _functionArgument(cmd: functionArg, single_command_allowed: bool):
 
     # If the command is a string, meaning the return value from a command
     if isinstance(cmd, str):
-        result = cmd
+        if single_command_allowed:
+            del pack._command_stack[-1]
+            result = cmd
+        else:
+            cmd = [cmd]
 
     # Or, if it's a function reference
     elif isinstance(cmd, FunctionType):
@@ -62,9 +58,11 @@ def _functionArgument(cmd: functionArg, single_command_allowed: bool):
         result = f"function {pack.namespace}:{_function_namespaces[cmd]}"
 
     # Or, if it's a list of commands
-    elif isinstance(cmd, list):
-        name = uuid4()
+    if isinstance(cmd, list):
+        # Delete the commands that were added to the stack
+        del pack._command_stack[-len(cmd):]
 
+        name = uuid4()
         result = f"function {pack.namespace}:{name}"
 
         # Create a file
@@ -76,7 +74,7 @@ def _functionArgument(cmd: functionArg, single_command_allowed: bool):
 
         with open(join(bp, rf"{name}.mcfunction"), "w") as f:
             # Write the commands to the file
-            f.writelines(_command_stack[-1])
+            f.write("\n".join(cmd))
 
     return result
 
@@ -148,11 +146,8 @@ def schedule(cmd: functionArg, time: int, units: str = "t"):
 
 class execute:
     def __init__(self):
-        print(_command_stack, "150")
         self.com = "execute"
-        _command_stack[-1].append(self.com)
-        _command_stack.append([])
-        print(_command_stack, "154")
+        pack._command_stack.append(self.com)
 
     @_command
     def at(self, selector):
@@ -299,7 +294,7 @@ class execute:
         """
         self.com += " run "
         self.com += _functionArgument(cmd, True)
-        del _command_stack[-1]
+        del pack._command_stack[-1]
         return self.com
 
     class _if_clause:

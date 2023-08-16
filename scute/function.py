@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from scute import _command_stack, pack, _function_namespaces
+from scute import pack, _function_namespaces
 from scute.internal.dictToNBT import dictToNBT
 from scute.datasources import DataSource
 from os.path import join
@@ -57,9 +57,9 @@ def func(function_namespace=None, function_name=None):
             os.makedirs(bp, exist_ok=True)
 
             with open(join(bp, rf"{name}.mcfunction"), "w") as f:
-                f.writelines(_command_stack[-1])
+                f.writelines(pack._command_stack)
 
-            _command_stack[-1] = []
+            pack._command_stack = []
 
             print(formatText(f"Created function {space}:{name}", 32))
 
@@ -72,7 +72,7 @@ def func(function_namespace=None, function_name=None):
                     print("Warning: Macro argument path should not be specified when using hardcoded nbt.")
             elif issubclass(type(args), DataSource):
                 command += f" with {args.str} {path}"
-            _command_stack[-1].append(command + "\n")
+            pack._command_stack.append(command + "\n")
 
         wrapper.unwrapped = function
 

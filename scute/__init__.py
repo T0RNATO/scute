@@ -9,7 +9,6 @@ import os
 import shutil
 from os.path import join
 
-_command_stack = [[]]
 _function_namespaces = {}
 
 class pack:
@@ -17,6 +16,7 @@ class pack:
     name = ""
     path = ""
     namespace = "scute"
+    _command_stack = []
 
     @staticmethod
     def build():
