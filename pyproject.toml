@@ -24,3 +24,4 @@ repository = "https://github.com/T0RNATO/scute"
 packages = [
     {include = "scute"}
 ]
+readme = "README.md"
