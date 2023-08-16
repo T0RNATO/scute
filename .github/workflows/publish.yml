@@ -28,16 +28,30 @@ jobs:
         tag: ${{ steps.tag_version.outputs.new_tag }}
         name: Release ${{ steps.tag_version.outputs.new_tag }}
 
-    - name: Set up Python
-      uses: actions/setup-python@v3
-      with:
-        python-version: '3.11'
+#    - name: Set up Python
+#      uses: actions/setup-python@v3
+#      with:
+#        python-version: '3.11'
+#
+#    - name: Install dependencies
+#      run: |
+#        python -m pip install --upgrade pip
+#        pip install build
+#    - name: Build package
+#      run: python -m build
 
-    - name: Install dependencies
+    - name: Setup Poetry
+      uses: pronovic/setup-poetry@v1
+      with:
+        version: "1.2.0"
+
+    - name: Bump vers
+      run: poetry version ${{ steps.tag_version.outputs.new_tag }}
+
+    - name: Build
       run: |
-        python -m pip install --upgrade pip
-        pip install build
-    - name: Build package
-      run: python -m build
+        cd /scute
+        poetry build
+
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
