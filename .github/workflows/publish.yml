@@ -1,4 +1,4 @@
-name: Upload Python Package
+name: Create release and publish to PyPi
 
 on:
   workflow_dispatch:
@@ -12,6 +12,13 @@ jobs:
     permissions:
       id-token: write
     steps:
+    - name: Semver release
+      uses: K-Phoen/semver-release-action@master
+      with:
+        release_branch: master
+        release_strategy: release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - uses: actions/checkout@v3
     - name: Set up Python
       uses: actions/setup-python@v3
