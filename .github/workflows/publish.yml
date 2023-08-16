@@ -12,14 +12,17 @@ jobs:
     permissions:
       id-token: write
     steps:
-    - name: Semver release
-      uses: K-Phoen/semver-release-action@master
+    - name: Bump version and push tag
+      id: tag_version
+      uses: mathieudutour/github-tag-action@v6.1
       with:
-        release_branch: master
-        release_strategy: release
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ secrets.GITHUB_TOKEN }}
     - uses: actions/checkout@v3
+    - name: Create a GitHub release
+      uses: ncipollo/release-action@v1
+      with:
+        tag: ${{ steps.tag_version.outputs.new_tag }}
+        name: Release ${{ steps.tag_version.outputs.new_tag }}
     - name: Set up Python
       uses: actions/setup-python@v3
       with:
