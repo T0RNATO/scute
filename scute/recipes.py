@@ -3,11 +3,13 @@ Submodule for creating and managing recipes - shaped crafting, smelting, etc.
 """
 from typing import TypeVar
 
-from scute.internal.utils import _createJsonFile, formatText
+from scute.internal.utils import create_json_file, format_text
 from scute.tags import ItemTag
+
 
 class Recipe:
     pass
+
 
 class ShapedCraftingLayout:
     def __init__(self, row1: str, row2: str, row3: str, key: dict[str, str | ItemTag]):
@@ -24,6 +26,7 @@ class ShapedCraftingLayout:
         else:
             self.rows = [row1, row2]
         self.key = key
+
 
 class RecipeType:
     class blasting(Recipe):
@@ -68,14 +71,13 @@ class RecipeType:
                     i: ({"tag": j.reference} if isinstance(j, ItemTag) else {"item": j})
                     for i, j in layout.key.items()
                 },
-                "result": {
-                    "item": output,
-                    "count": count
-                }
+                "result": {"item": output, "count": count},
             }
 
     class crafting_shapeless(Recipe):
-        def __init__(self, ingredients: list[str | ItemTag], output: str, count: int = 1):
+        def __init__(
+            self, ingredients: list[str | ItemTag], output: str, count: int = 1
+        ):
             """
             A shapeless crafting recipe in a crafting table, with a list of ingredients and an output that accept no nbt
             Args:
@@ -92,10 +94,7 @@ class RecipeType:
                     {"tag": i.reference} if isinstance(i, ItemTag) else {"item": i}
                     for i in ingredients
                 ],
-                "result": {
-                    "item": output,
-                    "count": count
-                }
+                "result": {"item": output, "count": count},
             }
 
     class smelting(Recipe):
@@ -112,6 +111,7 @@ class RecipeType:
 
     class smithing(Recipe):
         """Unimplemented"""
+
         pass
 
     class smoking(Recipe):
@@ -140,31 +140,26 @@ class RecipeType:
             self.count = count
             self.json = _singleInOutRecipe("smoking", input, output, count=count)
 
+
 def _singleInOutRecipe(id, input, output, count=None):
-    out = \
-        {
+    out = (
+        {"type": f"minecraft:{id}", "ingredient": {"item": input}, "result": output}
+        if isinstance(input, str)
+        else {
             "type": f"minecraft:{id}",
-            "ingredient": {
-                "item": input
-            },
-            "result": output
-        }\
-        if isinstance(input, str) else\
-        {
-            "type": f"minecraft:{id}",
-            "ingredient": {
-                "tag": input.reference
-            },
-            "result": output
+            "ingredient": {"tag": input.reference},
+            "result": output,
         }
+    )
     if count is not None and count != 1:
         out["count"] = count
 
     return out
 
 
-_Recipe = TypeVar('_Recipe', bound=Recipe)
+_Recipe = TypeVar("_Recipe", bound=Recipe)
+
 
 def registerRecipe(recipe: _Recipe, namespace: str, name: str):
-    _createJsonFile(namespace, name, r"recipes", recipe.json)
-    print(formatText(f"Created recipe {namespace}:{name}", 32))
+    create_json_file(namespace, name, r"recipes", recipe.json)
+    print(format_text(f"Created recipe {namespace}:{name}", 32))

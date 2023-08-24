@@ -1,10 +1,12 @@
 """
-Submodule for data sources, like block entities, entities, and storage - eventually to be used in /data etc
+Submodule for data sources like block entities, entities, and storage
 """
 from scute import pack
 
+
 class DataSource:
     pass
+
 
 class Storage(DataSource):
     def __init__(self, namespace: str):
@@ -19,6 +21,7 @@ class Storage(DataSource):
             self.namespace = f"{pack.namespace}:{namespace}"
         self.str = f"storage {self.namespace}"
 
+
 class BlockData(DataSource):
     def __init__(self, x, y, z):
         """
@@ -32,6 +35,7 @@ class BlockData(DataSource):
         self.y = y
         self.z = z
         self.str = f"block {x} {y} {z}"
+
 
 class EntityData(DataSource):
     def __init__(self, selector):

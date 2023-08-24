@@ -7,9 +7,14 @@ almost all elements of a datapack with pure code (eventually - at the moment it'
 import json
 import os
 import shutil
+from functools import wraps
 from os.path import join
 
+from scute.commands import execute
+from scute.function import _MacroArg
+
 _function_namespaces = {}
+
 
 class pack:
     meta = {"pack": {"pack_format": 1, "description": "My first pack"}}
@@ -19,17 +24,14 @@ class pack:
     _command_stack = []
 
     @staticmethod
-    def build():
+    def check_valid():
         """
         Checks the validity of your pack, and creates the file structure. Must be run at the top of the file after you define pack.name, etc
         """
         if pack.name != "":
             if pack.path != "":
                 bp = join(os.path.expandvars(pack.path), pack.name)
-                try:
-                    shutil.rmtree(bp)
-                except:
-                    pass
+                shutil.rmtree(bp, ignore_errors=True)
                 os.makedirs(bp, exist_ok=True)
                 try:
                     with open(join(bp, "pack.mcmeta"), "w") as mcmeta:
@@ -43,13 +45,11 @@ class pack:
 
             else:
                 print("Please set a path to compile to with scute.pack.setBuildPath()")
-                return
         else:
             print("Please set a pack name with scute.pack.setName()")
-            return
 
     @staticmethod
-    def setName(name):
+    def set_name(name):
         """
         Sets the display name of the pack
         Args:
@@ -58,7 +58,7 @@ class pack:
         pack.name = name
 
     @staticmethod
-    def setMainNamespace(namespace):
+    def set_main_namespace(namespace):
         """
         Sets the namespace that will be used for automatically-generated or anonymous functions
         Args:
@@ -67,7 +67,7 @@ class pack:
         pack.namespace = namespace
 
     @staticmethod
-    def setDescription(desc: str):
+    def set_description(desc: str):
         """
         Sets the description of your pack
         Args:
@@ -76,7 +76,7 @@ class pack:
         pack.meta["pack"]["description"] = desc
 
     @staticmethod
-    def setVersion(version: str | int):
+    def set_version(version: str | int):
         """
         Sets the version that the pack supports
         Args:
@@ -88,7 +88,7 @@ class pack:
             pack.meta["pack"]["pack_format"] = version
 
     @staticmethod
-    def setBuildPath(path: str):
+    def set_build_path(path: str):
         """
         Sets the folder which your datapack will be built into - for example, "%appdata%/.minecraft/saves/world/datapacks", or "./output"
         """
@@ -123,3 +123,27 @@ _versions = {
     "1.20": 15,
     "1.20.1": 15,
 }
+
+
+def _command(funct):
+    @wraps(funct)
+    def wrapper(*args):
+        is_macro: bool = any(isinstance(arg, _MacroArg) for arg in args)
+        result = funct(*args)
+
+        if isinstance(result, str):
+            command = result + "\n"
+            if is_macro:
+                command = "$" + command
+            pack._command_stack.append(command)
+
+        elif isinstance(result, execute):
+            command = result.com + "\n"
+            if is_macro:
+                command = "$" + command
+            # Overwrite command written by previous subcommand with new value
+            pack._command_stack[-1] = command
+
+        return result
+
+    return wrapper

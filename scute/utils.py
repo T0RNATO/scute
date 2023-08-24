@@ -5,7 +5,11 @@ from scute.recipes import ShapedCraftingLayout, registerRecipe, RecipeType
 from scute import pack
 
 
-def knowledgeBookCraft(outputItem: Item, recipe: ShapedCraftingLayout, dummyItem: str = "minecraft:knowledge_book"):
+def knowledgeBookCraft(
+    outputItem: Item,
+    recipe: ShapedCraftingLayout,
+    dummyItem: str = "minecraft:knowledge_book",
+):
     """
     Creates a "crafting recipe" that results in an item with nbt, using the knowledge book trick.
     Args:

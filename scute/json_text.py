@@ -2,24 +2,26 @@
 Submodule for json-formatted text, used in /tellraw or item names etc
 """
 from scute import _JsonText
-from scute.internal.dictToNBT import dictToNBT
+from scute.internal.dict_to_NBT import dict_to_NBT
 from scute.items import Item
 
-def JSONText(string: str,
-             italic: bool = False,
-             colour: str = None,
-             strikethrough: bool = None,
-             bold: bool = None,
-             underlined: bool = None,
-             obfuscated: bool = None,
-             click_url: str = None,
-             click_command: str = None,
-             click_suggest: str = None,
-             click_clipboard: str = None,
-             hover_text: dict | str = None,
-             hover_item: Item = None,
-             hover_entity: dict = None,
-             ):
+
+def JSONText(
+    string: str,
+    italic: bool = False,
+    colour: str = None,
+    strikethrough: bool = None,
+    bold: bool = None,
+    underlined: bool = None,
+    obfuscated: bool = None,
+    click_url: str = None,
+    click_command: str = None,
+    click_suggest: str = None,
+    click_clipboard: str = None,
+    hover_text: dict | str = None,
+    hover_item: Item = None,
+    hover_entity: dict = None,
+):
     """
     Creates json-formatted text. A maximum of one of the click_* or hover_* arguments can be specified
     Args:
@@ -40,35 +42,40 @@ def JSONText(string: str,
     Returns:
         A JsonText instance, to be passed into various functions
     """
-    optionalArgs = {
+    optional_args = {
         "strikethrough": strikethrough,
         "color": colour,
         "bold": bold,
         "underlined": underlined,
-        "obfuscated": obfuscated
+        "obfuscated": obfuscated,
     }
 
     text = {
         "text": string,
         "italic": italic,
-        **{key: value for key, value in optionalArgs.items() if value is not None}
+        **{key: value for key, value in optional_args.items() if value is not None},
     }
 
-    if click_url is not None: text["clickEvent"] = {"action": "open_url", "value": click_url}
-    if click_command is not None: text["clickEvent"] = {"action": "run_command", "value": click_command}
-    if click_suggest is not None: text["clickEvent"] = {"action": "suggest_command", "value": click_suggest}
-    if click_clipboard is not None: text["clickEvent"] = {"action": "copy_to_clipboard", "value": click_clipboard}
-    if hover_text is not None: text["hoverEvent"] = {"action": "show_text", "contents": hover_text}
+    if click_url is not None:
+        text["clickEvent"] = {"action": "open_url", "value": click_url}
+    if click_command is not None:
+        text["clickEvent"] = {"action": "run_command", "value": click_command}
+    if click_suggest is not None:
+        text["clickEvent"] = {"action": "suggest_command", "value": click_suggest}
+    if click_clipboard is not None:
+        text["clickEvent"] = {"action": "copy_to_clipboard", "value": click_clipboard}
+    if hover_text is not None:
+        text["hoverEvent"] = {"action": "show_text", "contents": hover_text}
     if hover_item is not None:
         data = {
             "action": "show_item",
             "contents": {
                 "id": hover_item.id,
                 "count": hover_item.count,
-            }
+            },
         }
         if hover_item.nbt is not None:
-            data["contents"]["tag"] = dictToNBT(hover_item.nbt)
+            data["contents"]["tag"] = dict_to_NBT(hover_item.nbt)
         text["hoverEvent"] = data
     if hover_entity is not None:
         if "type" in hover_entity:
@@ -78,16 +85,19 @@ def JSONText(string: str,
                     "contents": {
                         "type": hover_entity["type"],
                         "id": hover_entity["id"],
-                    }
+                    },
                 }
                 if "name" in hover_entity:
                     data["contents"]["name"] = hover_entity["name"]
                 text["hoverEvent"] = data
             else:
-                raise Exception("You must specify the UUID of the entity to show in a `show_entity` hover event, under the `id` field")
+                raise Exception(
+                    "You must specify the UUID of the entity to show in a `show_entity` hover event, under the `id` field"
+                )
         else:
             raise Exception(
-                "You must specify the type of the entity to show in a `show_entity` hover event, under the `type` field")
+                "You must specify the type of the entity to show in a `show_entity` hover event, under the `type` field"
+            )
 
     return _JsonText(text)
 
@@ -96,6 +106,7 @@ class Colour:
     """
     An enum of all the colours in the base game. Colour.red is the exact same as "red"
     """
+
     black = "black"
     dark_blue = "dark_blue"
     dark_green = "dark_green"

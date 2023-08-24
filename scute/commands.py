@@ -7,35 +7,13 @@ from os.path import join
 from scute.blocks import Block
 from scute.items import Item
 from scute.function import func, _MacroArg
-from scute.internal.dictToNBT import dictToNBT
-from scute import pack, _function_namespaces
+from scute.internal.dict_to_NBT import dict_to_NBT
+from scute import pack, _function_namespaces, _command
 from types import FunctionType
 
 from uuid import uuid4
-from functools import wraps
 
 functionArg = str | list | FunctionType
-
-def _command(funct):
-    @wraps(funct)
-    def wrapper(*args):
-        macro: bool = any(isinstance(arg, _MacroArg) for arg in args)
-        result = funct(*args)
-        if isinstance(result, str):
-            c = result + "\n"
-            if macro:
-                c = "$" + c
-            print(pack._command_stack, "34")
-            pack._command_stack.append(c)
-        elif isinstance(result, execute):
-            c = result.com + "\n"
-            if macro:
-                c = "$" + c
-            # Overwrite command written by previous subcommand with new value
-            pack._command_stack[-1] = c
-        return result
-
-    return wrapper
 
 
 def _functionArgument(cmd: functionArg, single_command_allowed: bool):
@@ -60,7 +38,7 @@ def _functionArgument(cmd: functionArg, single_command_allowed: bool):
     # Or, if it's a list of commands
     if isinstance(cmd, list):
         # Delete the commands that were added to the stack
-        del pack._command_stack[-len(cmd):]
+        del pack._command_stack[-len(cmd) :]
 
         name = uuid4()
         result = f"function {pack.namespace}:{name}"
@@ -101,6 +79,16 @@ def give(player, item: Item | str):
 
 
 @_command
+def run_raw(command: _MacroArg | str):
+    """
+    Runs a command from a string - useful for macros or unimplemented commands.
+    Args:
+        command: A string or macro argument
+    """
+    return command.arg if isinstance(command, _MacroArg) else command
+
+
+@_command
 def setblock(x, y, z, block: Block | str):
     """
     Places a block at some coordinates
@@ -117,7 +105,7 @@ def setblock(x, y, z, block: Block | str):
 
     com = f"setblock {x} {y} {z} {block.id}"
     if block.nbt is not None:
-        com += dictToNBT(block.nbt)
+        com += dict_to_NBT(block.nbt)
 
     return com
 
@@ -373,8 +361,19 @@ class execute:
             return self.ex
 
         @_command
-        def blocks(self, x1: int, y1: int, z1: int, x2: int, y2: int, z2: int, x3: int, y3: int, z3: int,
-                   scanmode: str):
+        def blocks(
+            self,
+            x1: int,
+            y1: int,
+            z1: int,
+            x2: int,
+            y2: int,
+            z2: int,
+            x3: int,
+            y3: int,
+            z3: int,
+            scanmode: str,
+        ):
             """
             Checks if the blocks in two regions match
             Args:
@@ -390,7 +389,9 @@ class execute:
                 scanmode: Whether air blocks should also be compared - "all" if yes, "masked" if no
             :return:
             """
-            self.ex.com += f" blocks {x1} {y1} {z1} {x2} {y2} {z2} {x3} {y3} {z3} {scanmode}"
+            self.ex.com += (
+                f" blocks {x1} {y1} {z1} {x2} {y2} {z2} {x3} {y3} {z3} {scanmode}"
+            )
             return self.ex
 
         @_command

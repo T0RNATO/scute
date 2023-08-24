@@ -1,6 +1,6 @@
 import json
 
-from scute.datatypes import _NumberType
+from scute.data_types import _NumberType
 
 
 def encode_value(value):
@@ -59,5 +59,5 @@ class dtn(json.JSONEncoder):
         return encode_dict_or_list(obj)
 
 
-def dictToNBT(dic):
+def dict_to_NBT(dic):
     return json.dumps(dic, cls=dtn)

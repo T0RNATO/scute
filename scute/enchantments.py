@@ -1,6 +1,8 @@
 """
 Enum for all enchantments in Minecraft.
 """
+
+
 class Enchantment:
     aqua_affinity = "aqua_affinity"
     bane_of_arthropods = "bane_of_arthropods"

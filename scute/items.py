@@ -2,7 +2,8 @@
 Enum for item types, and a class for creating items.
 """
 from scute import _JsonText
-from scute.internal.dictToNBT import dictToNBT
+from scute.internal.dict_to_NBT import dict_to_NBT
+
 
 def nbt(**kwargs):
     """
@@ -13,7 +14,9 @@ def nbt(**kwargs):
 
 
 class Item:
-    def __init__(self, id: str, nbt: dict = None, count=1, name: _JsonText | str = None):
+    def __init__(
+        self, id: str, nbt: dict = None, count=1, name: _JsonText | str = None
+    ):
         """
         Creates an item instance. Nbt can be specified manually with nbt= or using a utility, like name=
         Args:
@@ -33,7 +36,7 @@ class Item:
                 nbt["display"] = {}
             nbt["display"]["Name"] = str(name)
         self.nbt = nbt
-        self.commandFormat = self.id + dictToNBT(nbt)
+        self.commandFormat = self.id + dict_to_NBT(nbt)
         self.count = count
 
     acacia_boat = "acacia_boat"

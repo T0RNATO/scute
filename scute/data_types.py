@@ -1,6 +1,8 @@
 """
 Various data types used in NBT.
 """
+
+
 class _NumberType:
     letter = None
     int = False

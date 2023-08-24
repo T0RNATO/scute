@@ -14,5 +14,6 @@ from scute.commands import give
 def myFunc():
     give("@s", Item.green_dye)
 ```
+(Please note that it is installed with the name `scutemc` but is imported as `scute`)
 
-Recommended reading to start off: `scute.function`, `scute.item`
+Recommended reading to start off: `scute.function`, `scute.items`
