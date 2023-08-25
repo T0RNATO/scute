@@ -2,7 +2,9 @@
 Submodule for scoreboards and criteria
 """
 from scute.tags import _tags
-from scute import pack, _JsonText, _command
+from scute import pack
+from scute.commands import _command
+from scute.json_text import _JsonText
 from scute.internal.utils import create_function
 import atexit
 

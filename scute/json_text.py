@@ -1,9 +1,13 @@
 """
 Submodule for json-formatted text, used in /tellraw or item names etc
 """
-from scute import _JsonText
+import json
 from scute.internal.dict_to_NBT import dict_to_NBT
-from scute.items import Item
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from scute.items import Item
 
 
 def JSONText(
@@ -19,7 +23,7 @@ def JSONText(
     click_suggest: str = None,
     click_clipboard: str = None,
     hover_text: dict | str = None,
-    hover_item: Item = None,
+    hover_item: "Item" = None,
     hover_entity: dict = None,
 ):
     """
@@ -132,3 +136,11 @@ class Colour:
         A custom colour - alternatively, just use a string like "#FFFFFF"
         """
         return hex
+
+
+class _JsonText:
+    def __init__(self, text: dict):
+        self.text = text
+
+    def __str__(self):
+        return json.dumps(self.text)

@@ -3,10 +3,8 @@ from uuid import uuid4
 from scute import pack, _function_namespaces
 from scute.internal.dict_to_NBT import dict_to_NBT
 from scute.datasources import DataSource
-from os.path import join
 from inspect import signature
 from typing import TypeVar
-import os
 
 from scute.internal.utils import format_text, create_function
 

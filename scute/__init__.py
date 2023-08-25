@@ -7,11 +7,7 @@ almost all elements of a datapack with pure code (eventually - at the moment it'
 import json
 import os
 import shutil
-from functools import wraps
 from os.path import join
-
-from scute.commands import execute
-from scute.function import _MacroArg
 
 _function_namespaces = {}
 
@@ -95,14 +91,6 @@ class pack:
         pack.path = os.path.expandvars(path)
 
 
-class _JsonText:
-    def __init__(self, text: dict):
-        self.text = text
-
-    def __str__(self):
-        return json.dumps(self.text)
-
-
 _versions = {
     "1.16": 5,
     "1.16.1": 5,
@@ -123,27 +111,3 @@ _versions = {
     "1.20": 15,
     "1.20.1": 15,
 }
-
-
-def _command(funct):
-    @wraps(funct)
-    def wrapper(*args):
-        is_macro: bool = any(isinstance(arg, _MacroArg) for arg in args)
-        result = funct(*args)
-
-        if isinstance(result, str):
-            command = result + "\n"
-            if is_macro:
-                command = "$" + command
-            pack._command_stack.append(command)
-
-        elif isinstance(result, execute):
-            command = result.com + "\n"
-            if is_macro:
-                command = "$" + command
-            # Overwrite command written by previous subcommand with new value
-            pack._command_stack[-1] = command
-
-        return result
-
-    return wrapper

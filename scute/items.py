@@ -1,7 +1,7 @@
 """
 Enum for item types, and a class for creating items.
 """
-from scute import _JsonText
+from scute.json_text import _JsonText
 from scute.internal.dict_to_NBT import dict_to_NBT
 
 

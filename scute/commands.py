@@ -1,6 +1,7 @@
 """
 Submodule containing commands and command-related functions
 """
+from functools import wraps
 from os import makedirs
 from os.path import join
 
@@ -8,7 +9,7 @@ from scute.blocks import Block
 from scute.items import Item
 from scute.function import func, _MacroArg
 from scute.internal.dict_to_NBT import dict_to_NBT
-from scute import pack, _function_namespaces, _command
+from scute import pack, _function_namespaces
 from types import FunctionType
 
 from uuid import uuid4
@@ -55,6 +56,30 @@ def _functionArgument(cmd: functionArg, single_command_allowed: bool):
             f.write("\n".join(cmd))
 
     return result
+
+
+def _command(funct):
+    @wraps(funct)
+    def wrapper(*args):
+        is_macro: bool = any(isinstance(arg, _MacroArg) for arg in args)
+        result = funct(*args)
+
+        if isinstance(result, str):
+            command = result + "\n"
+            if is_macro:
+                command = "$" + command
+            pack._command_stack.append(command)
+
+        elif isinstance(result, execute):
+            command = result.com + "\n"
+            if is_macro:
+                command = "$" + command
+            # Overwrite command written by previous subcommand with new value
+            pack._command_stack[-1] = command
+
+        return result
+
+    return wrapper
 
 
 @_command
