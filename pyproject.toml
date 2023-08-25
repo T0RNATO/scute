@@ -7,3 +7,9 @@ documentation = "https://t0rnato.github.io/scute"
 repository = "https://github.com/T0RNATO/scute"
 packages = [{include = "scute"}]
 readme = "README.md"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+
+]
