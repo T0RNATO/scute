@@ -8,6 +8,141 @@ from scute.json_text import _JsonText
 from scute.internal.utils import create_function
 import atexit
 
+_scoreboard_list = []
+
+
+class Scoreboard:
+    def __init__(
+        self,
+        name: str,
+        criteria: str,
+        displayName: _JsonText = None,
+        displaySlot: str = None,
+    ):
+        """
+        Creates and initialises a scoreboard - this will be put in load.json. This object should be stored for doing operations on the scoreboard later.
+        Args:
+            name: Unique id of the scoreboard
+            criteria: The criteria of the scoreboard, like `scute.scoreboards.Criteria.dummy` or `scute.scoreboards.Criteria.mined`(`scute.blocks.Block.stone`)
+            displayName: Optional display name
+            displaySlot: Optional display slot, like `scute.scoreboards.DisplaySlots.sidebar` or `scute.scoreboards.DisplaySlots.sidebar_team`(`scute.json_text.Colour.red`) to be set in load.json
+        """
+        self.name = name
+        self.criteria = criteria
+        self.display = displayName
+        self.slot = displaySlot
+
+        _scoreboard_list.append(self)
+
+        load = "minecraft:load"
+        init = pack.namespace + ":scute_init"
+
+        if load not in _tags:
+            _tags[load] = [init]
+        elif init not in _tags[load]:
+            _tags[load].append(init)
+
+    @_command
+    def delete(self):
+        """
+        Deletes the scoreboard and all its data
+        """
+        return f"scoreboard objectives remove {self.name}"
+
+    @_command
+    def set_display(self, slot: str):
+        """
+        Sets the display slot of the scoreboard
+        Args:
+            slot: The display slot, like `scute.scoreboards.DisplaySlots.sidebar`
+        """
+        return f"scoreboard objectives setdisplay {slot} {self.name}"
+
+    @_command
+    def get(self, target: str):
+        """
+        Gets the score of a target in the scoreboard
+        Args:
+            target: The target(s), like "@s"
+        """
+        return f"scoreboard players get {target} {self.name}"
+
+    @_command
+    def set(self, target: str, value: int):
+        """
+        Sets the score of a target in the scoreboard
+        Args:
+            target: The target(s), like "@s"
+            value: The new value
+        """
+        return f"scoreboard players set {target} {self.name} {value}"
+
+    @_command
+    def add(self, target: str, value: int):
+        """
+        Adds a value to the score of a target in the scoreboard
+        Args:
+            target: The target(s), like "@s"
+            value: The value for the score to be incremented by
+        """
+        return f"scoreboard players add {target} {self.name} {value}"
+
+    @_command
+    def remove(self, target: str, value: int):
+        """
+        Removes a value from the score of a target in the scoreboard
+        Args:
+            target: The target(s), like "@s"
+            value: The value for the score to be decremented by
+        """
+        return f"scoreboard players remove {target} {self.name} {value}"
+
+    @_command
+    def reset(self, target: str):
+        """
+        Removes a target's score from the scoreboard
+        Args:
+            target: The target(s), like "@s"
+        """
+        return f"scoreboard players reset {target} {self.name}"
+
+    @_command
+    def enable(self, target: str):
+        """
+        Enables this scoreboard to be used in /trigger one time by the targets specified
+        Args:
+            target: The target(s), like "@s"
+        """
+        return f"scoreboard players enable {target} {self.name}"
+
+    @_command
+    def operation_as_source(
+        self, source_target, operation, target_scoreboard: "Scoreboard", target_target
+    ):
+        """
+        Runs an operation on a scoreboard value of a target of this scoreboard, and puts it into target_scoreboard under target_target
+        Args:
+            source_target: The target from this scoreboard to get the value from
+            operation: The operation, like TODO
+            target_scoreboard: The scoreboard which the value is put into
+            target_target: The target from the source scoreboard to put the value into
+        """
+        return f"scoreboard players operation {target_target} {target_scoreboard.name} {operation} {self.name} {source_target}"
+
+    @_command
+    def operation_as_target(
+        self, source_target, source_scoreboard: "Scoreboard", operation, target_target
+    ):
+        """
+        Runs an operation on a scoreboard value of a target of this scoreboard, and puts it into target_scoreboard under target_target
+        Args:
+            source_target: The target from source_scoreboard to get the value from
+            source_scoreboard: The scoreboard to get the value from
+            operation: The operation, like TODO
+            target_target: The target from this scoreboard that the value is put into
+        """
+        return f"scoreboard players operation {target_target} {self.name} {operation} {source_scoreboard.name} {source_target}"
+
 
 def _register_scoreboards():
     function = [
@@ -125,7 +260,7 @@ class Criteria:
         """
         Returns a scoreboard criteria string for the number of blocks of the type that have been mined.
         Args:
-            block: The block, like Block.stone
+            block: The block, like `scute.blocks.Block.stone`
         """
         return f"minecraft.mined:minecraft.{block}"
 
@@ -134,7 +269,7 @@ class Criteria:
         """
         Returns a scoreboard criteria string for the number of items that have run out of durability.
         Args:
-            item: The item, like Item.stone_pickaxe
+            item: The item, like `scute.items.Item.stone_pickaxe`
         """
         return f"minecraft.broken:minecraft.{item}"
 
@@ -143,7 +278,7 @@ class Criteria:
         """
         Returns a scoreboard criteria string for the number of items of a type that have been crafted.
         Args:
-            item: The item, like Item.diamond_chestplate
+            item: The item, like `scute.items.Item.diamond_chestplate`
         """
         return f"minecraft.crafted:minecraft.{item}"
 
@@ -152,7 +287,7 @@ class Criteria:
         """
         Returns a scoreboard criteria string for the number of items of a type that have been used.
         Args:
-            item: The item, like Item.stone_shovel
+            item: The item, like `scute.items.Item.stone_shovel`
         """
         return f"minecraft.used:minecraft.{item}"
 
@@ -161,7 +296,7 @@ class Criteria:
         """
         Returns a scoreboard criteria string for the number of items of a type that have been picked up.
         Args:
-            item: The item, like Item.diamond
+            item: The item, like `scute.items.Item.diamond`
         """
         return f"minecraft.picked_up:minecraft.{item}"
 
@@ -170,7 +305,7 @@ class Criteria:
         """
         Returns a scoreboard criteria string for the number of items of a type that have been dropped.
         Args:
-            item: The item, like Item.diamond
+            item: The item, like `scute.items.Item.diamond`
         """
         return f"minecraft.dropped:minecraft.{item}"
 
@@ -207,142 +342,6 @@ class DisplaySlots:
         """
         Returns a display slot for a team with the specified colour
         Args:
-            colour: The colour of the team to show the scoreboard to, like jsontext.Colour.red
+            colour: The colour of the team to show the scoreboard to, like `scute.json_text.Colour.red`
         """
         return f"sidebar.team.{colour}"
-
-
-_scoreboard_list = []
-
-
-class Scoreboard:
-    def __init__(
-        self,
-        name: str,
-        criteria: str,
-        displayName: _JsonText = None,
-        displaySlot: str = None,
-    ):
-        """
-        Creates and initialises a scoreboard - this will be put in load.json. This object should be stored for doing operations on the scoreboard later.
-        Args:
-            name: Unique id of the scoreboard
-            criteria: The criteria of the scoreboard, like Criteria.dummy or Criteria.mined(Block.stone)
-            displayName: Optional display name
-            displaySlot: Optional display slot, like DisplaySlots.sidebar or DisplaySlots.sidebar_team(Colour.red) to be set in load.json TODO
-        """
-        self.name = name
-        self.criteria = criteria
-        self.display = displayName
-        self.slot = displaySlot
-
-        _scoreboard_list.append(self)
-
-        load = "minecraft:load"
-        init = pack.namespace + ":scute_init"
-
-        if load not in _tags:
-            _tags[load] = [init]
-        elif init not in _tags[load]:
-            _tags[load].append(init)
-
-    @_command
-    def delete(self):
-        """
-        Deletes the scoreboard and all its data when used in a function
-        """
-        return f"scoreboard objectives remove {self.name}"
-
-    @_command
-    def set_display(self, slot: str):
-        """
-        Sets the display slot of the scoreboard
-        Args:
-            slot: The display slot, like DisplaySlots.sidebar
-        """
-        return f"scoreboard objectives setdisplay {slot} {self.name}"
-
-    @_command
-    def get(self, target: str):
-        """
-        Gets the score of a target in the scoreboard
-        Args:
-            target: The target(s), like "@s"
-        """
-        return f"scoreboard players get {target} {self.name}"
-
-    @_command
-    def set(self, target: str, value: int):
-        """
-        Sets the score of a target in the scoreboard
-        Args:
-            target: The target(s), like "@s"
-            value: The new value
-        """
-        return f"scoreboard players set {target} {self.name} {value}"
-
-    @_command
-    def add(self, target: str, value: int):
-        """
-        Adds a value to the score of a target in the scoreboard
-        Args:
-            target: The target(s), like "@s"
-            value: The value for the score to be incremented by
-        """
-        return f"scoreboard players add {target} {self.name} {value}"
-
-    @_command
-    def remove(self, target: str, value: int):
-        """
-        Removes a value from the score of a target in the scoreboard
-        Args:
-            target: The target(s), like "@s"
-            value: The value for the score to be decremented by
-        """
-        return f"scoreboard players remove {target} {self.name} {value}"
-
-    @_command
-    def reset(self, target: str):
-        """
-        Removes a target's score from the scoreboard
-        Args:
-            target: The target(s), like "@s"
-        """
-        return f"scoreboard players reset {target} {self.name}"
-
-    @_command
-    def enable(self, target: str):
-        """
-        Enables this scoreboard to be used in /trigger one time by the targets specified
-        Args:
-            target: The target(s), like "@s"
-        """
-        return f"scoreboard players enable {target} {self.name}"
-
-    @_command
-    def operation_as_source(
-        self, source_target, operation, target_scoreboard: "Scoreboard", target_target
-    ):
-        """
-        Runs an operation on a scoreboard value of a target of this scoreboard, and puts it into target_scoreboard under target_target
-        Args:
-            source_target: The target from this scoreboard to get the value from
-            operation: The operation, like TODO
-            target_scoreboard: The scoreboard which the value is put into
-            target_target: The target from the source scoreboard to put the value into
-        """
-        return f"scoreboard players operation {target_target} {target_scoreboard.name} {operation} {self.name} {source_target}"
-
-    @_command
-    def operation_as_target(
-        self, source_target, source_scoreboard: "Scoreboard", operation, target_target
-    ):
-        """
-        Runs an operation on a scoreboard value of a target of this scoreboard, and puts it into target_scoreboard under target_target
-        Args:
-            source_target: The target from source_scoreboard to get the value from
-            source_scoreboard: The scoreboard to get the value from
-            operation: The operation, like TODO
-            target_target: The target from this scoreboard that the value is put into
-        """
-        return f"scoreboard players operation {target_target} {self.name} {operation} {source_scoreboard.name} {source_target}"

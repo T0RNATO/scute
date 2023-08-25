@@ -230,7 +230,7 @@ class execute:
         """
         Sets the execution context's dimension (Note: `in` is reserved in python)
         Args:
-            dimension: The resource location of a dimension, like Dimension.overworld
+            dimension: The resource location of a dimension, like `scute.dimensions.Dimension.overworld`
         """
         self.com += f" in {dimension}"
         return self
@@ -240,7 +240,7 @@ class execute:
         """
         Sets the executor to an entity based on relation to the current executor entity
         Args:
-            relation: A relation like Relation.passengers
+            relation: A relation like `scute.relations.Relation.passengers`
         """
         self.com += f" on {relation}"
         return self
@@ -272,7 +272,7 @@ class execute:
         """
         Sets the execution context to one block above the value of a heightmap at this location
         Args:
-            heightmap: The heightmap to use, like Heightmap.world_surface
+            heightmap: The heightmap to use, like `scute.heightmaps.Heightmap.world_surface`
         """
         self.com += f" positioned over {heightmap}"
         return self
@@ -380,7 +380,7 @@ class execute:
                 x: The x position of the block
                 y: The y position of the block
                 z: The z position of the block
-                block: The block, like `Block(Block.dirt)`
+                block: The block, like `scute.blocks.Block`(`scute.blocks.Block.dirt`)
             """
             self.ex.com += f" block {x} {y} {z} {block.id}"
             return self.ex

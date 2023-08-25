@@ -34,7 +34,7 @@ class RecipeType:
             """
             A blasting recipe, with one input and one output that accept no nbt
             Args:
-                input: The input item, like Item.cobblestone
+                input: The input item, like `scute.items.Item.cobblestone`
                 output: The output item
             """
             self.input = input
@@ -46,7 +46,7 @@ class RecipeType:
             """
             A campfire cooking recipe, with one input and one output that accept no nbt
             Args:
-                input: The input item, like Item.cobblestone
+                input: The input item, like `scute.items.Item.cobblestone`
                 output: The output item
             """
             self.input = input
@@ -102,7 +102,7 @@ class RecipeType:
             """
             A smelting recipe, with one input and one output that accept no nbt
             Args:
-                input: The input item, like Item.cobblestone
+                input: The input item, like `scute.items.Item.cobblestone`
                 output: The output item
             """
             self.input = input
@@ -119,7 +119,7 @@ class RecipeType:
             """
             A smoking recipe, with one input and one output that accept no nbt
             Args:
-                input: The input item, like Item.cobblestone
+                input: The input item, like `scute.items.Item.cobblestone`
                 output: The output item
             """
             self.input = input
@@ -131,7 +131,7 @@ class RecipeType:
             """
             A stonecutting recipe, with one input and an output that accept no nbt
             Args:
-                input: The input item, like Item.cobblestone
+                input: The input item, like `scute.items.Item.cobblestone`
                 output: The output item
                 count: The amount of output items
             """

@@ -20,7 +20,7 @@ class Item:
         """
         Creates an item instance. Nbt can be specified manually with nbt= or using a utility, like name=
         Args:
-            id: The id of the item, like Item.diamond
+            id: The id of the item, like `scute.items.Item.diamond`
             nbt: Optional nbt for the item, like nbt(mytag=Byte(1)) or {"CustomModelData": 3}
             count: Optional count
             name: Utility for setting the name of the item
