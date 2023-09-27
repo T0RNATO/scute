@@ -1,4 +1,4 @@
-![Title](/assets/title.png)
+![Title](https://github.com/T0RNATO/scute/blob/90120b240b152c338037120220772d1600638a45/assets/title.png)
 
 [![Discord](https://img.shields.io/discord/1139873703556034620?label=discord)](https://discord.gg/RnRTjq24vX)
 [![GitHub Repo stars](https://img.shields.io/github/stars/t0rnato/scute?label=stars)](https://github.com/T0RNATO/scute)
