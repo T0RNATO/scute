@@ -2,13 +2,10 @@ from uuid import uuid4
 
 from scute import pack, _function_namespaces
 from scute.internal.dict_to_NBT import dict_to_NBT
-from scute.datasources import DataSource
+from scute.data_sources import DataSource, _NbtSource
 from inspect import signature
-from typing import TypeVar
 
 from scute.internal.utils import format_text, create_function
-
-_NbtSource = TypeVar("_NbtSource", bound=DataSource)
 
 
 class _MacroArguments:

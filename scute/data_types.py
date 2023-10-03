@@ -1,6 +1,7 @@
 """
 Various data types used in NBT.
 """
+from typing import TypeVar, Union
 
 
 class _NumberType:
@@ -12,6 +13,9 @@ class _NumberType:
             self.number = int(number)
         else:
             self.number = number
+
+    def __str__(self):
+        return str(self.number) + self.letter
 
     def getNbt(self):
         return str(self.number) + self.letter
@@ -38,3 +42,7 @@ class Float(_NumberType):
 
 class Double(_NumberType):
     letter = "d"
+
+
+_NumberTypeVar = TypeVar("_NumberTypeVar", bound=_NumberType)
+_NbtValue = Union[_NumberTypeVar, int, str, float, dict]

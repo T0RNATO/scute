@@ -4,7 +4,7 @@ from scute.blocks import Block
 from scute.items import nbt, Item
 from scute.tags import ItemTag, tick
 from scute.json_text import JSONText, Colour
-from scute.recipes import ShapedCraftingLayout, RecipeType, registerRecipe
+from scute.recipes import ShapedCraftingLayout, RecipeType
 
 pack.set_name("myDatapack")
 pack.set_version("1.19.4")
@@ -31,28 +31,27 @@ def my_macro(args):
 @func()
 def my_anonymous_function():
     give("@a", myItem)
-    run_raw(hi)
 
 
 @func(namespace, "my_function")
 def my_function():
-    # my_macro(nbt(x="@s"))
     my_anonymous_function()
 
-    execute().if_.block(1, 2, 3, Block(Block.gold_block)).run(
+    execute().if_.block(1, 2, 3, Block.gold_block).run(
         [
             give("@s", Item.acacia_boat),
-            setblock("~", "~", "~", Block(Block.diamond_block)),
+            setblock("~", "~", "~", Block.diamond_block),
         ]
     )
+    else_(give("@s", Item.diamond))
 
 
-mytag = ItemTag("minecraft:wool")
+mytag = ItemTag("minecraft", "wool")
 
-layout = ShapedCraftingLayout("AAA", "AAA", "BBB", {"A": Item.diamond, "B": mytag})
-
-myrecipe = RecipeType.crafting_shaped(layout, Item.dirt)
-
-registerRecipe(myrecipe, namespace, "my_recipe")
+# layout = ShapedCraftingLayout("AAA", "AAA", "BBB", {"A": Item.diamond, "B": mytag})
+#
+# myrecipe = RecipeType.crafting_shaped(layout, Item.dirt)
+#
+# registerRecipe(myrecipe, namespace, "my_recipe")
 
 # sonar.ignore

@@ -95,11 +95,11 @@ def JSONText(
                     data["contents"]["name"] = hover_entity["name"]
                 text["hoverEvent"] = data
             else:
-                raise Exception(
+                raise ValueError(
                     "You must specify the UUID of the entity to show in a `show_entity` hover event, under the `id` field"
                 )
         else:
-            raise Exception(
+            raise ValueError(
                 "You must specify the type of the entity to show in a `show_entity` hover event, under the `type` field"
             )
 

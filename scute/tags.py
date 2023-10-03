@@ -4,12 +4,27 @@ Submodule for creating and managing tags - function tags, block tags, item tags,
 import atexit
 
 from scute import _function_namespaces, pack
-from scute.internal.utils import create_json_file, format_text
+from scute.internal.utils import create_json_file, format_text, create_function
 
+# Dict of function tags, {"namespace:mytag": ["namespace:function", ...]}
 _tags = {}
+_scute_init = {"commands": [], "scoreboard_needed": False}
 
 
 def _create_function_tag_files():
+    if _scute_init["commands"]:
+        namespace = pack.namespace + ":scute_init"
+
+        if "minecraft:load" in _tags:
+            _tags["minecraft:load"].append(namespace)
+        else:
+            _tags["minecraft:load"] = [namespace]
+
+        if _scute_init["scoreboard_needed"]:
+            _scute_init["commands"].append("scoreboard objectives add scute dummy")
+
+        create_function(pack.namespace, "scute_init", _scute_init["commands"])
+
     for tag, functions in _tags.items():
         namespace, name = tag.split(":")
         create_json_file(
@@ -31,7 +46,7 @@ def _add_func_to_tag(func, tag, decoratorName):
         else:
             _tags[tag] = [name]
     except KeyError:
-        raise Exception(f"Please put @{decoratorName} decorators above @func")
+        raise RuntimeError(f"@{decoratorName} decorators must be put above @func")
 
 
 def load(func):
@@ -63,42 +78,28 @@ def functionTag(namespace, name):
 
 
 class BlockTag:
-    def __init__(
-        self, namespaceOrReference: str, name: str = None, entries: list[str] = None
-    ):
+    def __init__(self, namespace: str, name: str, entries: list[str] = None):
         """
-        Creates or references a block tag. When called with one argument, it references an existing tag. When called with all of them, it creates one with the given entries.
+        Creates or references a block tag. When called with two arguments, it references an existing tag. When called with three, it creates one with the given entries.
         Args:
-            namespaceOrReference: The namespace of the tag to be created or a reference to one, like "minecraft:wool"
+            namespace: The namespace of the tag being created or referenced
             name: The name of the tag
-            entries: The block ids of the tag
+            entries: The item ids of the tag if it's being created
         """
+        self.reference = f"{namespace}:{name}"
         if entries:
-            create_json_file(
-                namespaceOrReference, name, r"tags\blocks", {"values": entries}
-            )
-            self.reference = f"{namespaceOrReference}:{name}"
-            return
-
-        self.reference = namespaceOrReference
+            create_json_file(namespace, name, r"tags\blocks", {"values": entries})
 
 
 class ItemTag:
-    def __init__(
-        self, namespaceOrReference: str, name: str = None, entries: list[str] = None
-    ):
+    def __init__(self, namespace: str, name: str, entries: list[str] = None):
         """
-        Creates or references an item tag. When called with one argument, it references an existing tag. When called with all of them, it creates one with the given entries.
+        Creates or references an item tag. When called with two arguments, it references an existing tag. When called with three, it creates one with the given entries.
         Args:
-            namespaceOrReference: The namespace of the tag to be created, like "mypack" or a reference to one, like "minecraft:wool"
+            namespace: The namespace of the tag being created or referenced
             name: The name of the tag
-            entries: The block ids of the tag
+            entries: The item ids of the tag if it's being created
         """
+        self.reference = f"{namespace}:{name}"
         if entries:
-            create_json_file(
-                namespaceOrReference, name, r"tags\items", {"values": entries}
-            )
-            self.reference = f"{namespaceOrReference}:{name}"
-            return
-
-        self.reference = namespaceOrReference
+            create_json_file(namespace, name, r"tags\items", {"values": entries})

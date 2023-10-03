@@ -26,7 +26,7 @@ def myOtherFunction():
 ```
 
 ## Macros
-To define a macro function (1.20.1 snapshots+), give your function an argument. This represents the nbt compound that is passed in.
+To define a macro function (1.20.2+), give your function an argument. This represents the nbt compound that is passed in.
 ```python
 @func()
 def myFunction(args):
@@ -34,17 +34,19 @@ def myFunction(args):
 ```
 
 To call this function, just pass in some arguments.
+
 ```python
 from scute.items import nbt, Item
-from scute.datasources import Storage
+from scute.data_sources import Storage
 
 myStorage = Storage("my_namespace")
+
 
 @func()
 def myOtherFunction():
     myFunction(nbt(item="minecraft:egg"))
     # or
-    myFunction({"item":"minecraft:egg"})
+    myFunction({"item": "minecraft:egg"})
     # or
     myFunction(nbt(item=Item.egg))
     # or

@@ -8,7 +8,9 @@ from scute.tags import ItemTag
 
 
 class Recipe:
-    pass
+    def register(self, namespace: str, name: str):
+        create_json_file(namespace, name, r"recipes", self.json)
+        print(format_text(f"Created recipe {namespace}:{name}", 32))
 
 
 class ShapedCraftingLayout:
@@ -155,11 +157,3 @@ def _singleInOutRecipe(id, input, output, count=None):
         out["count"] = count
 
     return out
-
-
-_Recipe = TypeVar("_Recipe", bound=Recipe)
-
-
-def registerRecipe(recipe: _Recipe, namespace: str, name: str):
-    create_json_file(namespace, name, r"recipes", recipe.json)
-    print(format_text(f"Created recipe {namespace}:{name}", 32))

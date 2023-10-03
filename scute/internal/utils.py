@@ -16,12 +16,11 @@ def create_json_file(namespace, name, p, data):
 
 
 def create_function(namespace, name, lines: list[str]):
-    bp = join(pack.path, pack.name)
-    bp = join(bp, rf"data\{namespace}\functions")
+    bp = join(pack.path, pack.name, rf"data\{namespace}\functions")
 
     os.makedirs(bp, exist_ok=True)
 
-    with open(join(bp, rf"{name}.mcfunction"), "w") as f:
+    with open(join(bp, rf"{name}.mcfunction"), "a") as f:
         f.writelines(lines)
 
 

@@ -1,7 +1,7 @@
 """
 Submodule for scoreboards and criteria
 """
-from scute.tags import _tags
+from scute.tags import _tags, _scute_init
 from scute import pack
 from scute.commands import _command
 from scute.json_text import _JsonText
@@ -154,7 +154,7 @@ def _register_scoreboards():
         for scoreboard in _scoreboard_list
         if scoreboard.slot
     ]
-    create_function(pack.namespace, "scute_init", function)
+    _scute_init["commands"].extend(function)
 
 
 atexit.register(_register_scoreboards)

@@ -2,28 +2,34 @@
 Submodule containing commands and command-related functions
 """
 from functools import wraps
-from os import makedirs
-from os.path import join
 
 from scute.blocks import Block
+from scute.internal.utils import create_function
 from scute.items import Item
 from scute.function import func, _MacroArg
 from scute.internal.dict_to_NBT import dict_to_NBT
+from scute.tags import _scute_init
 from scute import pack, _function_namespaces
 from types import FunctionType
+from scute.data_sources import _NbtSource, EntityData, Storage, BlockData
+from scute.data_types import _NbtValue
 
 from uuid import uuid4
 
+# A single command, a function reference, or a list of commands
 functionArg = str | list | FunctionType
 
 
-def _functionArgument(cmd: functionArg, single_command_allowed: bool):
-    result = "" if single_command_allowed else "function "
+def _functionArgument(
+    cmd: functionArg, single_command_allowed: bool, delete: bool = True
+):
+    result = ""
 
     # If the command is a string, meaning the return value from a command
     if isinstance(cmd, str):
         if single_command_allowed:
-            del pack._command_stack[-1]
+            if delete:
+                del pack._command_stack[-1]
             result = cmd
         else:
             cmd = [cmd]
@@ -39,21 +45,16 @@ def _functionArgument(cmd: functionArg, single_command_allowed: bool):
     # Or, if it's a list of commands
     if isinstance(cmd, list):
         # Delete the commands that were added to the stack
-        del pack._command_stack[-len(cmd) :]
+        if delete:
+            del pack._command_stack[-len(cmd) :]
+
+        for i in range(len(cmd)):
+            cmd[i] += "\n"
 
         name = uuid4()
         result = f"function {pack.namespace}:{name}"
 
-        # Create a file
-        bp = join(pack.path, pack.name)
-        bp = join(bp, rf"data\{pack.namespace}\functions")
-        makedirs(bp, exist_ok=True)
-
-        _function_namespaces[function] = f"{pack.namespace}:{name}"
-
-        with open(join(bp, rf"{name}.mcfunction"), "w") as f:
-            # Write the commands to the file
-            f.write("\n".join(cmd))
+        create_function(pack.namespace, name, cmd)
 
     return result
 
@@ -128,11 +129,7 @@ def setblock(x, y, z, block: Block | str):
     elif isinstance(block, str):
         return f"setblock {x} {y} {z} {block}"
 
-    com = f"setblock {x} {y} {z} {block.id}"
-    if block.nbt is not None:
-        com += dict_to_NBT(block.nbt)
-
-    return com
+    return f"setblock {x} {y} {z} {block.id}{{dict_to_NBT(block.nbt)}}"
 
 
 @_command
@@ -150,7 +147,7 @@ def schedule(cmd: functionArg, time: int, units: str = "t"):
     """
     Schedules a function to run at a point in the future
     Args:
-        cmd: The function, command, or list of commands to run
+        cmd: The function or list of commands to run
         time: The time until it's run
         units: "t", "d", or "s", ticks, days, or seconds respectively until the function runs (defaults to ticks)
     """
@@ -305,8 +302,7 @@ class execute:
         Args:
             cmd: The command to run - can be a single command like give(), a list of commands, or a (non-wrapped!) function to run.
         """
-        self.com += " run "
-        self.com += _functionArgument(cmd, True)
+        self.com += " run " + _functionArgument(cmd, True)
         del pack._command_stack[-1]
         return self.com
 
@@ -380,9 +376,9 @@ class execute:
                 x: The x position of the block
                 y: The y position of the block
                 z: The z position of the block
-                block: The block, like `scute.blocks.Block`(`scute.blocks.Block.dirt`)
+                block: The block, like `scute.blocks.Block.dirt`
             """
-            self.ex.com += f" block {x} {y} {z} {block.id}"
+            self.ex.com += f" block {x} {y} {z} {block.id + dict_to_NBT(block.nbt) if isinstance(block, Block) else block}"
             return self.ex
 
         @_command
@@ -473,3 +469,164 @@ class execute:
     @property
     def unless(self):
         return execute._unless_clause(self)
+
+
+@_command
+def else_(cmd: functionArg):
+    """
+    Runs a command if the immediately previous `execute if` command did not pass
+    Args:
+        cmd: The function, command, or list of commands to run
+    """
+    _scute_init["scoreboard_needed"] = True
+    if isinstance(cmd, str):
+        del pack._command_stack[-1]
+
+    p = pack._command_stack[-1]
+    if "execute" not in p or "run" not in p or "if" not in p:
+        raise RuntimeError(
+            "else_ must be directly preceded by an `execute ... if ... run` command"
+        )
+
+    previous = p.split("run ")
+    base: str = previous[0]
+    run_command: str = previous[1]
+
+    if run_command.startswith("function"):
+        args = run_command.split(" ")
+        namespace, name = args[1].split(":")
+        # This function will append to an existing file if it already exists (which it does)
+        # Sets the score to 1 if the function runs, so that the next command knows if it succeeded
+        create_function(
+            namespace, name.rstrip(), ["\nscoreboard players set $success scute 1\n"]
+        )
+        # Make sure that the value isn't 1 due to meddling
+        pack._command_stack.insert(-1, "scoreboard players set $success scute 0\n")
+    else:
+        name = uuid4()
+        create_function(
+            pack.namespace,
+            name,
+            [run_command + "\n", "scoreboard players set $success scute 1\n"],
+        )
+        pack._command_stack[-1] = base + f"run function {pack.namespace}:{name}"
+    return (
+        f"execute unless score $success scute matches 1 run {_functionArgument(cmd, True, False)}\n"
+        "scoreboard players set $success scute 0"
+    )
+
+
+@_command
+def data_get(data_source: _NbtSource, path: str = None, scale: float = None):
+    """
+    Gets NBT data from an entity, block, or storage
+    Args:
+        data_source: Any child of `scute.datasources.DataSource`, Storage, BlockData, or EntityData
+        path: An optional NBT path to get data from
+        scale: An optional scale value to multiply the retrieved value by (if it is a number)
+    """
+    return f"data get {data_source.str} {path} {scale}"
+
+
+@_command
+def data_merge(data_source: _NbtSource, nbt: dict):
+    """
+    Merges NBT data into an entity, block, or storage
+    Args:
+        data_source: Any child of `scute.datasources.DataSource`, Storage, BlockData, or EntityData
+        nbt: NBT to merge (a dict, or nbt())
+    """
+    return f"data merge {data_source.str} {dict_to_NBT(nbt)}"
+
+
+@_command
+def data_remove(data_source: _NbtSource, path: str):
+    """
+    Removes an NBT compound or value from an entity, block, or storage
+    Args:
+        data_source: Any child of `scute.datasources.DataSource`, Storage, BlockData, or EntityData
+        path: The path to the NBT value or compound to remove
+    """
+    return f"data remove {data_source.str} {path}"
+
+
+class DataModification:
+    append = "append "
+    """Append the source data or direct value data onto the end of the pointed-to list."""
+    prepend = "prepend "
+    """Prepend the source data or direct value data onto the beginning of the pointed-to list."""
+    merge = "merge "
+    """Merge the source data or direct value data into the pointed-to object."""
+    set = "set "
+    """Set the specified tag to a data value."""
+
+    @staticmethod
+    def insert(i) -> str:
+        """
+        Insert the value into the pointed-to list as element `i`, then shift higher elements one position upward.
+        Args:
+            i: The index of the inserted element
+        """
+        return f"insert {i} "
+
+
+@_command
+def data_modify_from(
+    target: _NbtSource,
+    path: str,
+    modification: str,
+    source: _NbtSource,
+    source_path: str = None,
+):
+    """
+    Copies source nbt using an operation to the target
+    Args:
+        target: The nbt being modified
+        path: The nbt path of the source being modified
+        modification: The modification, like "set" or `scute.commands.DataModification.set`
+        source: The source which nbt is being copied from
+        source_path: Optional path for source
+    """
+    return f"data modify {target.str} {path} {modification} from {source.str} {source_path}"
+
+
+@_command
+def data_modify_string(
+    target: _NbtSource,
+    path: str,
+    modification: str,
+    source: _NbtSource,
+    source_path: str = None,
+    start: int = None,
+    end: int = None,
+):
+    """
+    Copies a string or a section of a string using an operation from the source to the target
+    Args:
+        target: The nbt being modified
+        path: The nbt path of the source being modified
+        modification: The modification, like "set" or `scute.commands.DataModification.set`
+        source: The source which nbt is being copied from
+        source_path: Optional path for source
+        start: Optional index of first character to include at the start of the string. Negative values are counted from the end of the string.
+        end: Optional index of the first character to exclude at the end of the string. Negative values are counted from the end of the string.
+    """
+    return f"data modify {target.str} {path} {modification} string {source.str} {source_path} {start} {end}"
+
+
+@_command
+def data_modify_value(
+    target: _NbtSource, path: str, modification: str, value: _NbtValue
+):
+    """
+    Uses an operation to modify the target with a fixed value
+    Args:
+        target: The nbt being modified
+        path: The nbt path of the source being modified
+        modification: The modification, like "set" or `scute.commands.DataModification.set`
+        value: The nbt value used, like Byte(1) or "hello" or an nbt compound
+    """
+    val = value
+    if isinstance(value, dict):
+        val = dict_to_NBT(value)
+    return f"data modify {target.str} {path} {modification} value {val}"

@@ -1,11 +1,16 @@
 """
 Submodule for data sources like block entities, entities, and storage
 """
+from typing import TypeVar
+
 from scute import pack
 
 
 class DataSource:
     pass
+
+
+_NbtSource = TypeVar("_NbtSource", bound=DataSource)
 
 
 class Storage(DataSource):
