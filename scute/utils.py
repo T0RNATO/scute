@@ -1,7 +1,7 @@
 from uuid import uuid4
 
 from scute.items import Item
-from scute.recipes import ShapedCraftingLayout, registerRecipe, RecipeType
+from scute.recipes import ShapedCraftingLayout, RecipeType
 from scute import pack
 
 
